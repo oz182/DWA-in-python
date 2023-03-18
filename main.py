@@ -34,3 +34,35 @@ class Enviourment:
     def add_obstacle(self, obstacle):
         # Add an obstacle to the environment
         self.obstacles.append(obstacle) # obstacle might need to be a class of itself?
+
+def animate(robot, env):
+    # Create a plot to visualize the simulation
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_xlim([0, env.width])
+    ax.set_ylim([0, env.height])
+    ax.set_aspect('equal')
+    plt.ion()
+    plt.show()
+
+    # Update the robot's position and plot it
+    while True:
+        robot.update(dt=0.1)
+        ax.clear()
+        for obstacle in env.obstacles:
+            ax.add_patch(obstacle.get_patch())
+        ax.add_patch(robot.get_patch())
+        plt.draw()
+        plt.pause(0.001)
+
+# Main code for the simulation
+
+def main():
+    # Create a new environment and add obstacles to it
+    #env = Environment(width=10, height=10)
+    #env.add_obstacle(RectangleObstacle(x
+    print("Hello world")
+    pass
+
+if __name__ == "__main__":
+    main()
