@@ -61,7 +61,7 @@ def main():
     # Create a new environment and add obstacles to it
     #env = Environment(width=10, height=10)
     #env.add_obstacle(RectangleObstacle(x
-    print("Hello world")
+    print("Hello world!")
     pass
 
 if __name__ == "__main__":
