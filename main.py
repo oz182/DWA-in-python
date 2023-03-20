@@ -5,12 +5,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import math
-
+from math import *
 
 # Define classes and functions for the simulation
 
-dt = 0.1 # need to think about the right place for this value. and to make it a constant
+dt = 0.1  # need to think about the right place for this value. and to make it a constant
+
 
 class Robot:
 
@@ -52,7 +52,13 @@ class Env:
 
     def add_obstacle(self, obstacle):
         # Add an obstacle to the environment
-        self.obstacles.append(obstacle)  # obstacle might need to be a class of itself? What is an obstacle?
+        self.obstacles.append((obstacle.x, obstacle.y, obstacle.radius))  # obstacle might need to be a class of itself? What is an obstacle?
+
+class obstacle:
+    def __init__(self, x, y, radius):
+        self.x = x
+        self.y = y
+        self.radius = radius
 
 
 def animate(robot, env):
@@ -84,6 +90,7 @@ SPEED = 1
 AVOIDANCE = 1
 SIGMA = 1
 
+
 def dynammic_window(robot, dt):
     # This function creates the dynamic window. This window can be imagine as a two axis graph where:
     # y axis - vertical speed
@@ -92,28 +99,36 @@ def dynammic_window(robot, dt):
     # Function input: Robot object, time interval dt
     # Function output: array of values contains the vertical and rotational speeds that creates the window
 
-    V_search = np.arange(start=-robot.Vmax, stop=robot.Vmax, step=1) # array from min speed (negtive max speed), max speed, with 0.1 steps
-    #V_admisable = np.arange(start=, stop=, step=)
-    #V_dynamic = np.arange(start=, stop=, step=)
+    V_search = np.arange(start=-robot.Vmax, stop=robot.Vmax + 0.1, step=0.1)
+    # array from min speed (negative max speed), max speed, with some steps
 
-    #W_search = np.arange(start=, stop=, step=)
-    #W_avoid = np.arange(start=, stop=, step=)
-    #W_dynamic = np.arange(start=, stop=, step=)
+    # V_admirable = np.arange(start=, stop=, step=)
+    # V_dynamic = np.arange(start=, stop=, step=)
+
+    # W_search = np.arange(start=, stop=, step=)
+    # W_avoid = np.arange(start=, stop=, step=)
+    # W_dynamic = np.arange(start=, stop=, step=)
 
     return V_search
-
 
     pass
 
 
 def dwa_planner(robot, env):
-    # Starting with the construction of the dynamic window
 
 
     pass
 
 
-# Main code for the simulation
+def distFromObs(robot, env, obstacle):
+    # Function that calculates the current distance from an obstacle
+
+    dist = sqrt(robot.x + obstacle.x)
+
+
+
+    pass
+
 
 def main():
     # Create a new environment and add obstacles to it
@@ -123,11 +138,11 @@ def main():
 
     robot_proto = Robot(0.5, 0.5, 45, 1, 1)
 
-    #animate(robot_proto, envFrame)
+    # animate(robot_proto, envFrame)
 
     print("Hello world!")
 
-    print(dynammic_window(robot_proto,0.1))
+    print(dynammic_window(robot_proto, 0.1))
 
     pass
 
