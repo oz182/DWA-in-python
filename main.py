@@ -28,8 +28,8 @@ class Robot:
         self.ay = 0
         self.W = 0
 
-        self.Vmax = 2
-        self.Wmax = 1
+        self.Vmax = Vmax
+        self.Wmax = Wmax
         self.acc_max = 1
         self.omegaMax = 1
 
@@ -85,8 +85,22 @@ AVOIDANCE = 1
 SIGMA = 1
 
 def dynammic_window(robot, dt):
+    # This function creates the dynamic window. This window can be imagine as a two axis graph where:
+    # y axis - vertical speed
+    # x axis - rotational speed
 
-    Streight_Vel = np.arange(start=-robot.Vmax,stop=robot.Vmax,step=robot.acc_max*dt)
+    # Function input: Robot object, time interval dt
+    # Function output: array of values contains the vertical and rotational speeds that creates the window
+
+    V_search = np.arange(start=-robot.Vmax, stop=robot.Vmax, step=1) # array from min speed (negtive max speed), max speed, with 0.1 steps
+    #V_admisable = np.arange(start=, stop=, step=)
+    #V_dynamic = np.arange(start=, stop=, step=)
+
+    #W_search = np.arange(start=, stop=, step=)
+    #W_avoid = np.arange(start=, stop=, step=)
+    #W_dynamic = np.arange(start=, stop=, step=)
+
+    return V_search
 
 
     pass
@@ -113,7 +127,7 @@ def main():
 
     print("Hello world!")
 
-    print(np.arange(start=1,stop=10,step=0.5))
+    print(dynammic_window(robot_proto,0.1))
 
     pass
 
