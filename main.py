@@ -64,22 +64,25 @@ class obstacle:
 def animate(robot, env):
     # Create a plot to visualize the simulation
     fig = plt.figure()
-    ax = fig.add_subplot(111)
+    ax = plt.subplot()
     ax.set_xlim([0, env.width])
     ax.set_ylim([0, env.height])
-    ax.set_aspect('equal')
-    plt.ion()
+    plt.grid()
+    #ax.set_aspect('equal')
+    #plt.ion()
     plt.show()
 
     # Update the robot's position and plot it
     while True:
         robot.update(dt=0.1)
-        ax.clear()
-        for obstacle in env.obstacles:
+        #ax.clear()
+        #for obstacle in env.obstacles:
             # ax.add_patch(obstacle.get_patch())  # Not clear what is get_patch??
-            pass
+            #pass
         # ax.add_patch(robot.get_patch())
-        plt.draw()
+        plt.plot(robot.x, robot.y, marker="o", markersize=20, markeredgecolor="red", markerfacecolor="green")
+        plt.show()
+        #plt.draw()
         plt.pause(0.001)
 
 
@@ -141,11 +144,11 @@ def main():
 
     robot_proto = Robot(0.5, 0.5, 45, 1, 1)
 
-    # animate(robot_proto, envFrame)
+    animate(robot_proto, envFrame)
 
     print("Hello world!")
 
-    print(dynammic_window(robot_proto, 0.1))
+    #print(dynammic_window(robot_proto, 0.1))
 
     pass
 
