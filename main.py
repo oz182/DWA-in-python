@@ -99,17 +99,20 @@ def dynammic_window(robot, dt):
     # Function input: Robot object, time interval dt
     # Function output: array of values contains the vertical and rotational speeds that creates the window
 
-    V_search = np.arange(start=-robot.Vmax, stop=robot.Vmax + 0.1, step=0.1)
+            #----Stright speed axis------#
+    V_searchspace = [0, robot.Vmax]
     # array from min speed (negative max speed), max speed, with some steps
 
-    # V_admirable = np.arange(start=, stop=, step=)
-    # V_dynamic = np.arange(start=, stop=, step=)
+    V_admirable = [robot.vx - (robot.acc_max * dt), robot.vx + (robot.acc_max * dt)] # Only Vx... Might needs to be Vxy, or add another list of Vy
 
-    # W_search = np.arange(start=, stop=, step=)
-    # W_avoid = np.arange(start=, stop=, step=)
-    # W_dynamic = np.arange(start=, stop=, step=)
+    V_dynamic = [min(V_searchspace[0], V_admirable[0]), max(V_searchspace[1], V_admirable[1])]
 
-    return V_search
+            #----Rotational speed axis-----#
+    W_search = [-robot.Wmax, robot.Wmax]
+    W_avoid = []
+    W_dynamic = []
+
+    return V_dynamic, W_dynamic
 
     pass
 
