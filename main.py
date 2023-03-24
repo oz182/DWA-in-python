@@ -62,6 +62,17 @@ class obstacle:
         self.radius = radius
 
 
+class DWA_parameters:
+    def __init__(self):
+
+        self.HEADING = 1
+        self.SPEED = 1
+        self.AVOIDANCE = 1
+        self.SIGMA = 1
+
+        self.speed_Res = 0.01
+
+
 def simulation(robot, env):
     # Create a plot to visualize the simulation
     fig = plt.figure()
@@ -110,16 +121,20 @@ def dynammic_window(robot, dt):
     V_admirable = [robot.vx - (robot.acc_max * dt),
                    robot.vx + (robot.acc_max * dt)]  # Only Vx... Might needs to be Vxy, or add another list of Vy
 
-    V_dynamic = [min(V_searchspace[0], V_admirable[0]), max(V_searchspace[1], V_admirable[1])]
-    # the line above takes the minimal value between the admirable and search space in one value of the list
-    # and in another value of the list it takes the maximal value
+    V_dynamic = [max(V_searchspace[0], V_admirable[0]), min(V_searchspace[1], V_admirable[1])]
+    # Explanation for the intersection above:
+    # MAX between the minimum speeds (search and admirable)
+    # MIN between the maximum speeds (search and admirable)
 
     # ----Rotational speed axis-----#
-    W_searchspace = [0, robot.Wmax]
+    W_searchspace = [-robot.Wmax, robot.Wmax]
 
     W_admirable = [robot.W - (robot.RotAccMax * dt),
                    robot.W + (robot.RotAccMax * dt)]
-    W_dynamic = [min(W_searchspace[0], W_admirable[0]), max(W_searchspace[1], W_admirable[1])]
+    W_dynamic = [max(W_searchspace[0], W_admirable[0]), min(W_searchspace[1], W_admirable[1])]
+    # Explanation for the intersection above:
+    # MAX between the minimum speeds (search and admirable)
+    # MIN between the maximum speeds (search and admirable)
 
     return V_dynamic, W_dynamic
 
