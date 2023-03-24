@@ -31,7 +31,7 @@ class Robot:
         self.Vmax = Vmax
         self.Wmax = Wmax
         self.acc_max = 1
-        self.omegaMax = 1
+        self.RotAccMax = 1
 
     def update(self, dt):  # Update the robot position and velocities based on the acceleration and time interval
         # Velocity update
@@ -54,6 +54,7 @@ class Env:
         # Add an obstacle to the environment
         self.obstacles.append((obstacle))  # obstacle might need to be a class of itself? What is an obstacle?
 
+
 class obstacle:
     def __init__(self, x, y, radius):
         self.x = x
@@ -68,10 +69,10 @@ def simulation(robot, env):
     ax.set_xlim([0, env.width])
     ax.set_ylim([0, env.height])
     plt.grid()
-    #ax.set_aspect('equal')
-    #plt.ion()
-    #plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
-    #plt.show()
+    # ax.set_aspect('equal')
+    # plt.ion()
+    # plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
+    # plt.show()
 
     # Update the robot's position and plot it
     while True:
@@ -80,7 +81,8 @@ def simulation(robot, env):
         ax.set_xlim([0, env.width])
         ax.set_ylim([0, env.height])
         plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
-        plt.plot(env.obstacles, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
+        # plt.plot(env.obstacles, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
+        # I still need to figure out how to print the obstacles
         plt.draw()
         plt.pause(0.001)
 
@@ -101,18 +103,23 @@ def dynammic_window(robot, dt):
     # Function input: Robot object, time interval dt
     # Function output: array of values contains the vertical and rotational speeds that creates the window
 
-            #----Stright speed axis------#
+    # ----Straight speed axis------#
     V_searchspace = [0, robot.Vmax]
-    # array from min speed (negative max speed), max speed, with some steps
+    # array from min speed (negative max speed - or now i kept it as zero), max speed, with some steps
 
-    V_admirable = [robot.vx - (robot.acc_max * dt), robot.vx + (robot.acc_max * dt)] # Only Vx... Might needs to be Vxy, or add another list of Vy
+    V_admirable = [robot.vx - (robot.acc_max * dt),
+                   robot.vx + (robot.acc_max * dt)]  # Only Vx... Might needs to be Vxy, or add another list of Vy
 
     V_dynamic = [min(V_searchspace[0], V_admirable[0]), max(V_searchspace[1], V_admirable[1])]
+    # the line above takes the minimal value between the admirable and search space in one value of the list
+    # and in another value of the list it takes the maximal value
 
-            #----Rotational speed axis-----#
-    W_search = [-robot.Wmax, robot.Wmax]
-    W_avoid = []
-    W_dynamic = []
+    # ----Rotational speed axis-----#
+    W_searchspace = [0, robot.Wmax]
+
+    W_admirable = [robot.W - (robot.RotAccMax * dt),
+                   robot.W + (robot.RotAccMax * dt)]
+    W_dynamic = [min(W_searchspace[0], W_admirable[0]), max(W_searchspace[1], W_admirable[1])]
 
     return V_dynamic, W_dynamic
 
@@ -120,8 +127,6 @@ def dynammic_window(robot, dt):
 
 
 def dwa_planner(robot, env):
-
-
     pass
 
 
@@ -130,8 +135,6 @@ def distFromObs(robot, env, obstacle):
 
     dist = sqrt(robot.x + obstacle.x)
 
-
-
     pass
 
 
@@ -139,15 +142,16 @@ def main():
     # Create a new environment and add obstacles to it
 
     envFrame = Env(10, 10)
-    envFrame.add_obstacle(obstacle(x=8,y=4,radius=3))
+    envFrame.add_obstacle(obstacle(x=8, y=4, radius=3))
 
     robot_proto = Robot(5, 5, 45, 1, 1)
+    robot_proto.ax = 0.05
 
     #simulation(robot_proto, envFrame)
 
-    print(envFrame.obstacles[0])
+    # print(envFrame.obstacles[0])
 
-    #print(dynammic_window(robot_proto, 0.1))
+    print(dynammic_window(robot_proto, 0.1))
 
     pass
 
