@@ -52,7 +52,7 @@ class Env:
 
     def add_obstacle(self, obstacle):
         # Add an obstacle to the environment
-        self.obstacles.append((obstacle.x, obstacle.y, obstacle.radius))  # obstacle might need to be a class of itself? What is an obstacle?
+        self.obstacles.append((obstacle))  # obstacle might need to be a class of itself? What is an obstacle?
 
 class obstacle:
     def __init__(self, x, y, radius):
@@ -61,7 +61,7 @@ class obstacle:
         self.radius = radius
 
 
-def animate(robot, env):
+def simulation(robot, env):
     # Create a plot to visualize the simulation
     fig = plt.figure()
     ax = plt.subplot()
@@ -70,19 +70,18 @@ def animate(robot, env):
     plt.grid()
     #ax.set_aspect('equal')
     #plt.ion()
-    plt.show()
+    #plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
+    #plt.show()
 
     # Update the robot's position and plot it
     while True:
         robot.update(dt=0.1)
-        #ax.clear()
-        #for obstacle in env.obstacles:
-            # ax.add_patch(obstacle.get_patch())  # Not clear what is get_patch??
-            #pass
-        # ax.add_patch(robot.get_patch())
-        plt.plot(robot.x, robot.y, marker="o", markersize=20, markeredgecolor="red", markerfacecolor="green")
-        plt.show()
-        #plt.draw()
+        ax.clear()
+        ax.set_xlim([0, env.width])
+        ax.set_ylim([0, env.height])
+        plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
+        plt.plot(env.obstacles, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
+        plt.draw()
         plt.pause(0.001)
 
 
@@ -140,13 +139,13 @@ def main():
     # Create a new environment and add obstacles to it
 
     envFrame = Env(10, 10)
-    # env.add_obstacle(RectangleObstacle(x))
+    envFrame.add_obstacle(obstacle(x=8,y=4,radius=3))
 
-    robot_proto = Robot(0.5, 0.5, 45, 1, 1)
+    robot_proto = Robot(5, 5, 45, 1, 1)
 
-    animate(robot_proto, envFrame)
+    #simulation(robot_proto, envFrame)
 
-    print("Hello world!")
+    print(envFrame.obstacles[0])
 
     #print(dynammic_window(robot_proto, 0.1))
 
