@@ -64,13 +64,24 @@ class obstacle:
 
 class DWA_parameters:
     def __init__(self):
-
         self.HEADING = 1
         self.SPEED = 1
         self.AVOIDANCE = 1
         self.SIGMA = 1
-
         self.speed_Res = 0.01
+        self.PredictTime = 3
+
+
+
+class Trajectory:
+    def __init__(self, V, W):
+        self.xPos = []
+        self.yPos = []
+        self.AnglePos = []
+        self.V = V
+        self.W = W
+
+
 
 
 def simulation(robot, env):
@@ -144,7 +155,29 @@ def dynammic_window(robot, dt):
 
 
 
-def GanerateTrajects(robot, dynamic_window, dt):
+def GanerateTrajects(robot, dynamic_window, SpeedRes):
+
+    # This function will generate a list of all the possible trajectories.
+
+    # Input: robot class, the dynamic window, and speed resolution
+    # Output: The function returns a lists of trajectory instances
+
+    stright_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
+    # list of all the velocities in the V axis, by a defined resolution - straight velocities
+
+    rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
+    # list of all the velocities in the W axis, by a defined resolution - rotational
+
+    for i in stright_vel_list:
+
+        for j in rotational_vel_list:
+
+
+
+            pass
+        pass
+
+
 
 
     pass
@@ -188,7 +221,9 @@ def main():
 
     # print(envFrame.obstacles[0])
 
-    print(dynammic_window(robot_proto, 0.1))
+    dm = dynammic_window(robot_proto, 0.1)
+
+    print(list(np.arange(dm[0][0], dm[0][1], 0.001)))
 
     pass
 
