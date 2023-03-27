@@ -141,7 +141,29 @@ def dynammic_window(robot, dt):
     pass
 
 
-def dwa_planner(robot, env):
+
+
+
+def GanerateTrajects(robot, dynamic_window, dt):
+
+
+    pass
+
+
+
+
+def ChooseTraj(robot, dwa_param):
+
+    pass
+
+
+
+
+def dwa_planner(robot, env, dt):
+
+    Dyn_Win_edges = dynammic_window(robot, dt)
+
+
     pass
 
 
