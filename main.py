@@ -81,6 +81,33 @@ class Trajectory:
         self.V = V
         self.W = W
 
+    def GanerateTrajects(self, robot, dynamic_window, SpeedRes):
+
+        # This function will generate a list of all the possible trajectories.
+
+        # Input: robot class, the dynamic window, and speed resolution
+        # Output: The function returns a lists of trajectory instances.
+        #         Those trajectories will be physically possible to make by the robot (depends on the robot's dynamic)
+
+        stright_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
+        # list of all the velocities in the V axis, by a defined resolution - straight velocities
+
+        rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
+        # list of all the velocities in the W axis, by a defined resolution - rotational
+
+        for i in stright_vel_list:
+
+            for j in rotational_vel_list:
+
+                self.xPos.append()
+                self.yPos.append()
+
+
+                pass
+            pass
+
+        pass
+
 
 
 
@@ -152,35 +179,34 @@ def dynammic_window(robot, dt):
     pass
 
 
+# ------------The next function is comment out because i've decided to put it in a dedicated class
+#               I still have to see the progress and test if this is the best way
 
 
-
-def GanerateTrajects(robot, dynamic_window, SpeedRes):
-
-    # This function will generate a list of all the possible trajectories.
-
-    # Input: robot class, the dynamic window, and speed resolution
-    # Output: The function returns a lists of trajectory instances
-
-    stright_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
-    # list of all the velocities in the V axis, by a defined resolution - straight velocities
-
-    rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
-    # list of all the velocities in the W axis, by a defined resolution - rotational
-
-    for i in stright_vel_list:
-
-        for j in rotational_vel_list:
-
-
-
-            pass
-        pass
-
-
-
-
-    pass
+# def GanerateTrajects(robot, dynamic_window, SpeedRes):
+#
+#     # This function will generate a list of all the possible trajectories.
+#
+#     # Input: robot class, the dynamic window, and speed resolution
+#     # Output: The function returns a lists of trajectory instances
+#
+#     stright_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
+#     # list of all the velocities in the V axis, by a defined resolution - straight velocities
+#
+#     rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
+#     # list of all the velocities in the W axis, by a defined resolution - rotational
+#
+#     for i in stright_vel_list:
+#
+#         for j in rotational_vel_list:
+#
+#
+#
+#
+#             pass
+#         pass
+#
+#     pass
 
 
 
@@ -215,15 +241,9 @@ def main():
     envFrame.add_obstacle(obstacle(x=8, y=4, radius=3))
 
     robot_proto = Robot(5, 5, 45, 1, 1)
-    robot_proto.ax = 0.05
+    robot_proto.ax = 0.05 # This value is the one that makes the movement
 
-    #simulation(robot_proto, envFrame)
-
-    # print(envFrame.obstacles[0])
-
-    dm = dynammic_window(robot_proto, 0.1)
-
-    print(list(np.arange(dm[0][0], dm[0][1], 0.001)))
+    #simulation(robot_proto, envFrame) # Simulation test
 
     pass
 
