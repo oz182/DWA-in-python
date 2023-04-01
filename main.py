@@ -9,14 +9,22 @@ from math import *
 
 # Define classes and functions for the simulation
 
-dt = 0.1  # need to think about the right place for this value. and to make it a constant
+class Config:
+
+    # This function will store all the configuration parameters for the simulation and for the algorithm
+
+    def __init__(self):
+        self.dt = 0.1
+
+
+
 
 
 class Robot:
 
     # This class create an instance of a robot.
     # The robot has a position, heading (theta), and a maximum velocity and rotational velocity
-    # The robot also should have a maximum acceleration, I should add it.
+    # The robot also should have a maximum acceleration.
 
     def __init__(self, x, y, theta, Vmax, Wmax):
         self.x = x
@@ -80,35 +88,6 @@ class Trajectory:
         self.AnglePos = []
         self.V = V
         self.W = W
-
-    def GanerateTrajects(self, robot, dynamic_window, SpeedRes):
-
-        # This function will generate a list of all the possible trajectories.
-
-        # Input: robot class, the dynamic window, and speed resolution
-        # Output: The function returns a lists of trajectory instances.
-        #         Those trajectories will be physically possible to make by the robot (depends on the robot's dynamic)
-
-        stright_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
-        # list of all the velocities in the V axis, by a defined resolution - straight velocities
-
-        rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
-        # list of all the velocities in the W axis, by a defined resolution - rotational
-
-        for i in stright_vel_list:
-
-            for j in rotational_vel_list:
-
-                self.xPos.append()
-                self.yPos.append()
-
-
-                pass
-            pass
-
-        pass
-
-
 
 
 def simulation(robot, env):
@@ -183,32 +162,36 @@ def dynammic_window(robot, dt):
 #               I still have to see the progress and test if this is the best way
 
 
-# def GanerateTrajects(robot, dynamic_window, SpeedRes):
-#
-#     # This function will generate a list of all the possible trajectories.
-#
-#     # Input: robot class, the dynamic window, and speed resolution
-#     # Output: The function returns a lists of trajectory instances
-#
-#     stright_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
-#     # list of all the velocities in the V axis, by a defined resolution - straight velocities
-#
-#     rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
-#     # list of all the velocities in the W axis, by a defined resolution - rotational
-#
-#     for i in stright_vel_list:
-#
-#         for j in rotational_vel_list:
-#
-#
-#
-#
-#             pass
-#         pass
-#
-#     pass
+def GanerateAndChooseTrajectory(robot, dynamic_window, SpeedRes):
+
+    # This Function will generate each nominated trajectory, and choose the best one so far in each inside loop.
+
+    # Input: robot class, the dynamic window, and speed resolution
+    # Output: The function returns a lists of trajectory instances
+
+    straight_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
+    # list of all the velocities in the V axis, by a defined resolution - straight velocities
+
+    rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
+    # list of all the velocities in the W axis, by a defined resolution - rotational
+
+    for vel in straight_vel_list:
+
+        for omega in rotational_vel_list:
+
+            PredictTraj = TrajectoryPrediction(vel, omega)
 
 
+
+            pass
+        pass
+
+    pass
+
+
+def TrajectoryPrediction(vel, omega):
+
+    pass
 
 
 def ChooseTraj(robot, dwa_param):
@@ -220,7 +203,10 @@ def ChooseTraj(robot, dwa_param):
 
 def dwa_planner(robot, env, dt):
 
+    traj = Trajectory()
+
     Dyn_Win_edges = dynammic_window(robot, dt)
+    Trajectory.GanerateTrajects(traj, robot, Dyn_Win_edges)
 
 
     pass
@@ -234,6 +220,15 @@ def distFromObs(robot, env, obstacle):
     pass
 
 
+def MotionPlanner(robot):
+
+    # while robot position is NOT close to the goal position.
+    # Close definition will be given with some tolerance.
+
+    # This function will be universal and can be use in other projects.
+
+    pass
+
 def main():
     # Create a new environment and add obstacles to it
 
@@ -242,6 +237,7 @@ def main():
 
     robot_proto = Robot(5, 5, 45, 1, 1)
     robot_proto.ax = 0.05 # This value is the one that makes the movement
+
 
     #simulation(robot_proto, envFrame) # Simulation test
 
