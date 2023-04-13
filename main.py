@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import time
 from math import *
 
+
 # Define classes and functions for the simulation
 
 class Config:
@@ -17,13 +18,10 @@ class Config:
         self.dt = 0.1
 
 
-
-
-
 class Robot:
 
     # This class create an instance of a robot.
-    # The robot has a position, heading (theta), and a maximum velocity and rotational velocity
+    # The robot has a position (x,y), heading (theta), and a maximum velocity and rotational velocity
     # The robot also should have a maximum acceleration.
 
     def __init__(self, x, y, theta, Vmax, Wmax):
@@ -57,10 +55,23 @@ class Env:
         self.width = width
         self.height = height
         self.obstacles = []
+        self.goal = ()
 
     def add_obstacle(self, obstacle):
         # Add an obstacle to the environment
         self.obstacles.append((obstacle))  # obstacle might need to be a class of itself? What is an obstacle?
+
+    def RanddomObstacles(self, NumberOfObs, Env):
+        # The function creates a random obstacles (In a loop) and using the insert them into the environment object
+
+        # Output: ----------------
+        #
+        pass
+
+    def SetGoal(self, x, y):
+        # In this function the user can set the goal position for the robot (just x and y coordinates)
+        self.goal = (x, y)
+        pass
 
 
 class obstacle:
@@ -80,7 +91,6 @@ class DWA_parameters:
         self.PredictTime = 3
 
 
-
 class Trajectory:
     def __init__(self, V, W):
         self.xPos = []
@@ -97,6 +107,7 @@ def simulation(robot, env):
     ax.set_xlim([0, env.width])
     ax.set_ylim([0, env.height])
     plt.grid()
+
     # ax.set_aspect('equal')
     # plt.ion()
     # plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
@@ -108,9 +119,11 @@ def simulation(robot, env):
         ax.clear()
         ax.set_xlim([0, env.width])
         ax.set_ylim([0, env.height])
-        plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
-        # plt.plot(env.obstacles, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
-        # I still need to figure out how to print the obstacles
+        plt.plot(robot.x, robot.y, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green")
+        for obs in env.obstacles:
+            plt.plot(obs.x, obs.y, marker='o', markersize=obs.radius, markeredgecolor="black", markerfacecolor="red")
+        plt.plot(env.goal[0], env.goal[1], marker="s", markersize=10, markeredgecolor="blue", markerfacecolor="green")
+        plt.grid()
         plt.draw()
         plt.pause(0.001)
 
@@ -163,7 +176,6 @@ def dynammic_window(robot, dt):
 
 
 def GanerateAndChooseTrajectory(robot, dynamic_window, SpeedRes):
-
     # This Function will generate each nominated trajectory, and choose the best one so far in each inside loop.
 
     # Input: robot class, the dynamic window, and speed resolution
@@ -178,10 +190,7 @@ def GanerateAndChooseTrajectory(robot, dynamic_window, SpeedRes):
     for vel in straight_vel_list:
 
         for omega in rotational_vel_list:
-
             PredictTraj = TrajectoryPrediction(vel, omega)
-
-
 
             pass
         pass
@@ -190,24 +199,18 @@ def GanerateAndChooseTrajectory(robot, dynamic_window, SpeedRes):
 
 
 def TrajectoryPrediction(vel, omega):
-
     pass
 
 
 def ChooseTraj(robot, dwa_param):
-
     pass
 
 
-
-
 def dwa_planner(robot, env, dt):
-
     traj = Trajectory()
 
     Dyn_Win_edges = dynammic_window(robot, dt)
     Trajectory.GanerateTrajects(traj, robot, Dyn_Win_edges)
-
 
     pass
 
@@ -221,7 +224,6 @@ def distFromObs(robot, env, obstacle):
 
 
 def MotionPlanner(robot):
-
     # while robot position is NOT close to the goal position.
     # Close definition will be given with some tolerance.
 
@@ -229,17 +231,21 @@ def MotionPlanner(robot):
 
     pass
 
+
 def main():
     # Create a new environment and add obstacles to it
 
     envFrame = Env(10, 10)
-    envFrame.add_obstacle(obstacle(x=8, y=4, radius=3))
+    envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
+    envFrame.add_obstacle(obstacle(x=3, y=7, radius=15))
+    envFrame.SetGoal(8, 8)
 
     robot_proto = Robot(5, 5, 45, 1, 1)
-    robot_proto.ax = 0.05 # This value is the one that makes the movement
+    robot_proto.ax = 0.05  # This value is the one that makes the movement, For now this line is only for the simulation
 
+    dwa_planner(robot_proto, envFrame, 0.01)
 
-    #simulation(robot_proto, envFrame) # Simulation test
+    # simulation(robot_proto, envFrame)  # Simulation test
 
     pass
 
