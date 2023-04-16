@@ -12,7 +12,7 @@ from math import *
 
 class Config:
 
-    # This function will store all the configuration parameters for the simulation and for the algorithm
+    # This function will store all the configuration parameters for the simulation and for other main purposes
 
     def __init__(self):
         self.dt = 0.1
@@ -81,7 +81,7 @@ class obstacle:
         self.radius = radius
 
 
-class DWA_parameters:
+class DWA_Config:
     def __init__(self):
         self.HEADING = 1
         self.SPEED = 1
@@ -99,6 +99,8 @@ class Trajectory:
         self.V = V
         self.W = W
 
+
+# Define crucial functions of the algorithm
 
 def simulation(robot, env):
     # Create a plot to visualize the simulation
@@ -128,15 +130,7 @@ def simulation(robot, env):
         plt.pause(0.001)
 
 
-# Define the weights od the DWA algorithm
-
-HEADING = 1
-SPEED = 1
-AVOIDANCE = 1
-SIGMA = 1
-
-
-def dynammic_window(robot, dt):
+def dynamic_window(robot, dt):
     # This function creates the dynamic window. This window can be imagine as a two axis graph where:
     # y axis - vertical speed
     # x axis - rotational speed
@@ -171,11 +165,7 @@ def dynammic_window(robot, dt):
     pass
 
 
-# ------------The next function is comment out because i've decided to put it in a dedicated class
-#               I still have to see the progress and test if this is the best way
-
-
-def GanerateAndChooseTrajectory(robot, dynamic_window, SpeedRes):
+def create_and_choose_trajectory(robot, dynamic_window, SpeedRes):
     # This Function will generate each nominated trajectory, and choose the best one so far in each inside loop.
 
     # Input: robot class, the dynamic window, and speed resolution
@@ -190,7 +180,7 @@ def GanerateAndChooseTrajectory(robot, dynamic_window, SpeedRes):
     for vel in straight_vel_list:
 
         for omega in rotational_vel_list:
-            PredictTraj = TrajectoryPrediction(vel, omega)
+            PredictTraj = trajectory_prediction(vel, omega)
 
             pass
         pass
@@ -198,24 +188,24 @@ def GanerateAndChooseTrajectory(robot, dynamic_window, SpeedRes):
     pass
 
 
-def TrajectoryPrediction(vel, omega):
-    pass
+def trajectory_prediction(vel, omega):
+    return 0
 
 
-def ChooseTraj(robot, dwa_param):
+def choose_trajectory(robot, dwa_param):
     pass
 
 
 def dwa_planner(robot, env, dt):
     traj = Trajectory()
 
-    Dyn_Win_edges = dynammic_window(robot, dt)
-    Trajectory.GanerateTrajects(traj, robot, Dyn_Win_edges)
+    Dyn_Win_edges = dynamic_window(robot, dt)
+    Trajectory.ganerate_trajects(traj, robot, Dyn_Win_edges)
 
     pass
 
 
-def distFromObs(robot, env, obstacle):
+def dist_from_obs(robot, env, obstacle):
     # Function that calculates the current distance from an obstacle
 
     dist = sqrt(robot.x + obstacle.x)
@@ -223,7 +213,7 @@ def distFromObs(robot, env, obstacle):
     pass
 
 
-def MotionPlanner(robot):
+def motion_planner(robot):
     # while robot position is NOT close to the goal position.
     # Close definition will be given with some tolerance.
 
@@ -243,9 +233,9 @@ def main():
     robot_proto = Robot(5, 5, 45, 1, 1)
     robot_proto.ax = 0.05  # This value is the one that makes the movement, For now this line is only for the simulation
 
-    dwa_planner(robot_proto, envFrame, 0.01)
+    # dwa_planner(robot_proto, envFrame, 0.01)
 
-    # simulation(robot_proto, envFrame)  # Simulation test
+    simulation(robot_proto, envFrame)  # Simulation test
 
     pass
 
