@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import time
 from math import *
 
+TIME_STEP = 0.01 # Simulation Time step
 
-# Define classes and functions for the simulation
+# ---------------------- Define classes and functions for the simulation ---------------------
 
 class Config:
 
@@ -59,7 +60,7 @@ class Env:
 
     def add_obstacle(self, obstacle):
         # Add an obstacle to the environment
-        self.obstacles.append((obstacle))  # obstacle might need to be a class of itself? What is an obstacle?
+        self.obstacles.append((obstacle))
 
     def RanddomObstacles(self, NumberOfObs, Env):
         # The function creates a random obstacles (In a loop) and using the insert them into the environment object
@@ -80,6 +81,8 @@ class obstacle:
         self.y = y
         self.radius = radius
 
+# ------------------------------ Option for algorithm classes --------------------------------
+
 
 class DWA_Config:
     def __init__(self):
@@ -99,8 +102,12 @@ class Trajectory:
         self.V = V
         self.W = W
 
+    def NewTraj(self, x, y):
+        self.xPos.append(x)
+        self.yPos.append(y)
 
-# Define crucial functions of the algorithm
+
+# ----------- Define functions of the algorithm (Except the simulation function) -------------
 
 def simulation(robot, env):
     # Create a plot to visualize the simulation
@@ -165,30 +172,44 @@ def dynamic_window(robot, dt):
     pass
 
 
-def create_and_choose_trajectory(robot, dynamic_window, SpeedRes):
+def create_and_choose_trajectory(robot, dynamic_win, dwa_param):
     # This Function will generate each nominated trajectory, and choose the best one so far in each inside loop.
 
     # Input: robot class, the dynamic window, and speed resolution
     # Output: The function returns a lists of trajectory instances
 
-    straight_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], SpeedRes))
+    straight_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], dwa_param.speed_Res))
     # list of all the velocities in the V axis, by a defined resolution - straight velocities
 
-    rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], SpeedRes))
+    rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], dwa_param.speed_Res))
     # list of all the velocities in the W axis, by a defined resolution - rotational
 
     for vel in straight_vel_list:
 
         for omega in rotational_vel_list:
-            PredictTraj = trajectory_prediction(vel, omega)
+            PredictTraj = trajectory_prediction(robot, vel, omega, TIME_STEP, dwa_param)
 
             pass
         pass
 
     pass
 
+    return 0
 
-def trajectory_prediction(vel, omega):
+
+def trajectory_prediction(robot, vel, omega, dt, dwa_param):
+
+    # The following for loop will have to be done on some list that will contain all the changes
+    # It shouldn't have permission to change something on the actual robot
+
+    for dt in dwa_param.PredictTime:
+
+        Position_X = robot.x + (vel * cos(robot.theta) * dt)
+        Position_Y = robot.y + (vel * sin(robot.theta) * dt)
+        Position_theta = robot.theta + (omega * dt)
+
+        pass
+
     return 0
 
 
@@ -196,11 +217,11 @@ def choose_trajectory(robot, dwa_param):
     pass
 
 
-def dwa_planner(robot, env, dt):
-    traj = Trajectory()
+def dwa_planner(env, dwa_param, robot, dt):
 
     Dyn_Win_edges = dynamic_window(robot, dt)
-    Trajectory.ganerate_trajects(traj, robot, Dyn_Win_edges)
+
+    All_Trajectories = create_and_choose_trajectory(robot, Dyn_Win_edges, dwa_param)
 
     pass
 
@@ -230,12 +251,14 @@ def main():
     envFrame.add_obstacle(obstacle(x=3, y=7, radius=15))
     envFrame.SetGoal(8, 8)
 
+    DWA_Parameters = DWA_Config()
+
     robot_proto = Robot(5, 5, 45, 1, 1)
     robot_proto.ax = 0.05  # This value is the one that makes the movement, For now this line is only for the simulation
 
-    # dwa_planner(robot_proto, envFrame, 0.01)
+    dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
-    simulation(robot_proto, envFrame)  # Simulation test
+    simulation(robot_proto, envFrame, TIME_STEP)  # Simulation test
 
     pass
 
