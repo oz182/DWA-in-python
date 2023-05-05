@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import time
 from math import *
 
-TIME_STEP = 0.01 # Simulation Time step
+TIME_STEP = 0.01  # Simulation Time step
+
 
 # ---------------------- Define classes and functions for the simulation ---------------------
 
@@ -81,6 +82,7 @@ class obstacle:
         self.y = y
         self.radius = radius
 
+
 # ------------------------------ Option for algorithm classes --------------------------------
 
 
@@ -109,7 +111,7 @@ class Trajectory:
 
 # ----------- Define functions of the algorithm (Except the simulation function) -------------
 
-def simulation(robot, env):
+def simulation(robot, env, TIME_STEP):
     # Create a plot to visualize the simulation
     fig = plt.figure()
     ax = plt.subplot()
@@ -124,7 +126,7 @@ def simulation(robot, env):
 
     # Update the robot's position and plot it
     while True:
-        robot.update(dt=0.1)
+        robot.update(TIME_STEP)
         ax.clear()
         ax.set_xlim([0, env.width])
         ax.set_ylim([0, env.height])
@@ -178,10 +180,10 @@ def create_and_choose_trajectory(robot, dynamic_win, dwa_param):
     # Input: robot class, the dynamic window, and speed resolution
     # Output: The function returns a lists of trajectory instances
 
-    straight_vel_list = list(np.arange(dynamic_window[0][0], dynamic_window[0][1], dwa_param.speed_Res))
+    straight_vel_list = list(np.arange(dynamic_win[0][0], dynamic_win[0][1], dwa_param.speed_Res))
     # list of all the velocities in the V axis, by a defined resolution - straight velocities
 
-    rotational_vel_list = list(np.arange(dynamic_window[1][0], dynamic_window[1][1], dwa_param.speed_Res))
+    rotational_vel_list = list(np.arange(dynamic_win[1][0], dynamic_win[1][1], dwa_param.speed_Res))
     # list of all the velocities in the W axis, by a defined resolution - rotational
 
     for vel in straight_vel_list:
@@ -189,7 +191,6 @@ def create_and_choose_trajectory(robot, dynamic_win, dwa_param):
         for omega in rotational_vel_list:
             PredictTraj = trajectory_prediction(robot, vel, omega, TIME_STEP, dwa_param)
 
-            pass
         pass
 
     pass
@@ -198,19 +199,29 @@ def create_and_choose_trajectory(robot, dynamic_win, dwa_param):
 
 
 def trajectory_prediction(robot, vel, omega, dt, dwa_param):
-
     # The following for loop will have to be done on some list that will contain all the changes
     # It shouldn't have permission to change something on the actual robot
 
-    for dt in dwa_param.PredictTime:
+    Traj_X_PositionList = []
+    Traj_Y_PositionList = []
+    Traj_THETA_PositionList = []
 
-        Position_X = robot.x + (vel * cos(robot.theta) * dt)
-        Position_Y = robot.y + (vel * sin(robot.theta) * dt)
-        Position_theta = robot.theta + (omega * dt)
+    Temp_robotX = robot.x
+    Temp_robotY = robot.y
+    Temp_robotTHETA = robot.theta
 
-        pass
+    for step_num in np.arange(0, dwa_param.PredictTime, dt):
+        Temp_robotX = Temp_robotX + (vel * cos(robot.theta) * dt)
+        Traj_X_PositionList.append(Temp_robotX)
 
-    return 0
+        Temp_robotY = Temp_robotY + (vel * sin(robot.theta) * dt)
+        Traj_Y_PositionList.append(Temp_robotY)
+
+        Temp_robotTHETA = Temp_robotTHETA + (omega * dt)
+        Traj_THETA_PositionList.append(Temp_robotTHETA)
+
+    return [Traj_X_PositionList, Traj_Y_PositionList, Traj_THETA_PositionList]
+    # Should it be a list or a tuple? Does it matter?
 
 
 def choose_trajectory(robot, dwa_param):
@@ -218,7 +229,6 @@ def choose_trajectory(robot, dwa_param):
 
 
 def dwa_planner(env, dwa_param, robot, dt):
-
     Dyn_Win_edges = dynamic_window(robot, dt)
 
     All_Trajectories = create_and_choose_trajectory(robot, Dyn_Win_edges, dwa_param)
