@@ -149,7 +149,7 @@ def dynamic_window(robot, dt):
 
     # ----Straight speed axis------#
     V_searchspace = [0, robot.Vmax]
-    # array from min speed (negative max speed - or now i kept it as zero), max speed, with some steps
+    # array from min speed (negative max speed - for now i kept it as zero), max speed, with some steps
 
     V_admirable = [robot.vx - (robot.acc_max * dt),
                    robot.vx + (robot.acc_max * dt)]  # Only Vx... Might needs to be Vxy, or add another list of Vy
@@ -170,6 +170,25 @@ def dynamic_window(robot, dt):
     # MIN between the maximum speeds (search and admirable)
 
     return V_dynamic, W_dynamic
+
+    pass
+
+
+def dynamic_window_v2(robot, dt):
+    # Construction of the dynamic window will be as follow:
+    # V_ss (Search space), V_a (Collision detection), V_d (The robot's dynamics), V_r (intersection between all)
+
+    V_ss = [0, robot.Vmax, -robot.Wmax, robot.Wmax]
+
+    # V_a will be added in advanced steps
+
+    V_d = [robot.vx - robot.acc_max * dt, robot.vx + robot.acc_max * dt,
+           robot.W - robot.acc_max * dt, robot.W + robot.acc_max * dt]
+
+    V_r = [max(V_ss[0], V_d[0]), min(V_ss[1], V_d[1]),
+           max(V_ss[2], V_d[2]), min(V_ss[3], V_d[3])]
+
+    return V_r
 
     pass
 
@@ -229,7 +248,7 @@ def choose_trajectory(robot, dwa_param):
 
 
 def dwa_planner(env, dwa_param, robot, dt):
-    Dyn_Win_edges = dynamic_window(robot, dt)
+    Dyn_Win_edges = dynamic_window_v2(robot, dt)
 
     All_Trajectories = create_and_choose_trajectory(robot, Dyn_Win_edges, dwa_param)
 
