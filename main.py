@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import time
 from math import *
 
-TIME_STEP = 0.01  # Simulation Time step
+TIME_STEP = 0.1  # Simulation Time step
 
 
 # ---------------------- Define classes and functions for the simulation ---------------------
@@ -26,20 +26,22 @@ class Robot:
     # The robot has a position (x,y), heading (theta), and a maximum velocity and rotational velocity
     # The robot also should have a maximum acceleration.
 
-    def __init__(self, x, y, theta, Vmax, Wmax):
-        self.x = x
-        self.y = y
-        self.theta = theta
+    def __init__(self, x, y, theta):
+        self.x = x  # Set x initial position
+        self.y = y  # Set y initial position
+        self.theta = theta  # Set angle initial position
         self.vx = 0
         self.vy = 0
         self.ax = 0
         self.ay = 0
         self.W = 0
 
-        self.Vmax = Vmax
-        self.Wmax = Wmax
-        self.acc_max = 1
-        self.RotAccMax = 1
+        self.Traj = []
+
+        self.Vmax = 10  # [m/s]
+        self.Wmax = 40.0 * pi / 180.0  # [rad/s]
+        self.acc_max = 2  # [m/ss]
+        self.RotAccMax = 40.0 * pi / 180.0  # [rad/ss]
 
     def update(self, dt):  # Update the robot position and velocities based on the acceleration and time interval
         # Velocity update
@@ -85,7 +87,6 @@ class obstacle:
 
 # ------------------------------ Option for algorithm classes --------------------------------
 
-
 class DWA_Config:
     def __init__(self):
         self.HEADING = 1
@@ -127,13 +128,24 @@ def simulation(robot, env, TIME_STEP):
     # Update the robot's position and plot it
     while True:
         robot.update(TIME_STEP)
+
         ax.clear()
         ax.set_xlim([0, env.width])
         ax.set_ylim([0, env.height])
+
         plt.plot(robot.x, robot.y, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green")
+
+        for i in range(len(robot.Traj[0])):
+            plt.plot((robot.Traj[0][i] * cos(robot.Traj[2][i])), (robot.Traj[1][i] * sin(robot.Traj[2][i])),
+                     color="red")
+
+        #  The plot trajectory is not working
+
         for obs in env.obstacles:
             plt.plot(obs.x, obs.y, marker='o', markersize=obs.radius, markeredgecolor="black", markerfacecolor="red")
+
         plt.plot(env.goal[0], env.goal[1], marker="s", markersize=10, markeredgecolor="blue", markerfacecolor="green")
+
         plt.grid()
         plt.draw()
         plt.pause(0.001)
@@ -148,52 +160,48 @@ def dynamic_window(robot, dt):
     # Function output: array of values contains the vertical and rotational speeds that creates the window
 
     # ----Straight speed axis------#
-    V_searchspace = [0, robot.Vmax]
+    V_ss = [-robot.Vmax, robot.Vmax]
     # array from min speed (negative max speed - for now i kept it as zero), max speed, with some steps
 
-    V_admirable = [robot.vx - (robot.acc_max * dt),
-                   robot.vx + (robot.acc_max * dt)]  # Only Vx... Might needs to be Vxy, or add another list of Vy
+    V_d = [robot.vx - (robot.acc_max * dt),
+           robot.vx + (robot.acc_max * dt)]  # Only Vx... Might needs to be Vxy, or add another list of Vy
 
-    V_dynamic = [max(V_searchspace[0], V_admirable[0]), min(V_searchspace[1], V_admirable[1])]
+    V_r = [max(V_ss[0], V_d[0]), min(V_ss[1], V_d[1])]
     # Explanation for the intersection above:
     # MAX between the minimum speeds (search and admirable)
     # MIN between the maximum speeds (search and admirable)
 
     # ----Rotational speed axis-----#
-    W_searchspace = [-robot.Wmax, robot.Wmax]
+    W_ss = [-robot.Wmax, robot.Wmax]
 
-    W_admirable = [robot.W - (robot.RotAccMax * dt),
-                   robot.W + (robot.RotAccMax * dt)]
-    W_dynamic = [max(W_searchspace[0], W_admirable[0]), min(W_searchspace[1], W_admirable[1])]
+    W_d = [robot.W - (robot.RotAccMax * dt),
+           robot.W + (robot.RotAccMax * dt)]
+    W_r = [max(W_ss[0], W_d[0]), min(W_ss[1], W_d[1])]
     # Explanation for the intersection above:
     # MAX between the minimum speeds (search and admirable)
     # MIN between the maximum speeds (search and admirable)
 
-    return V_dynamic, W_dynamic
+    return V_r, W_r
 
     pass
 
 
-def dynamic_window_v2(robot, dt):
-    # Construction of the dynamic window will be as follow:
-    # V_ss (Search space), V_a (Collision detection), V_d (The robot's dynamics), V_r (intersection between all)
+def goal_cost(trajectory, goal):
+    delta_x = abs(goal[0] - trajectory[0][-1])  # trajectory[x position][last value] - Take the end of the trajectory
+    delta_y = abs(goal[1] - trajectory[1][-1])
 
-    V_ss = [0, robot.Vmax, -robot.Wmax, robot.Wmax]
+    delta_head = atan2(delta_y, delta_x)
 
-    # V_a will be added in advanced steps
+    GoalCostValue = abs(delta_head - trajectory[2][-1])
 
-    V_d = [robot.vx - robot.acc_max * dt, robot.vx + robot.acc_max * dt,
-           robot.W - robot.acc_max * dt, robot.W + robot.acc_max * dt]
+    return GoalCostValue
 
-    V_r = [max(V_ss[0], V_d[0]), min(V_ss[1], V_d[1]),
-           max(V_ss[2], V_d[2]), min(V_ss[3], V_d[3])]
 
-    return V_r
-
+def obstacle_cost(trajectory, obs):
     pass
 
 
-def create_and_choose_trajectory(robot, dynamic_win, dwa_param):
+def create_and_choose_trajectory(goal, robot, dynamic_win, dwa_param):
     # This Function will generate each nominated trajectory, and choose the best one so far in each inside loop.
 
     # Input: robot class, the dynamic window, and speed resolution
@@ -205,12 +213,25 @@ def create_and_choose_trajectory(robot, dynamic_win, dwa_param):
     rotational_vel_list = list(np.arange(dynamic_win[1][0], dynamic_win[1][1], dwa_param.speed_Res))
     # list of all the velocities in the W axis, by a defined resolution - rotational
 
+    MinTotalCost = float(inf)  # Define the initial cost to infinity - for minimizing the cost function
+
     for vel in straight_vel_list:
 
         for omega in rotational_vel_list:
             PredictTraj = trajectory_prediction(robot, vel, omega, TIME_STEP, dwa_param)
 
-        pass
+            TotalCost = (goal_cost(PredictTraj, goal) * dwa_param.HEADING) + 0
+
+            if MinTotalCost >= TotalCost:
+                MinTotalCost = TotalCost
+
+                Best_U_vector = [vel, omega]
+                BestTraj = PredictTraj
+
+            # This trajectory needs to be compared to the last trajectory (In terms of cost)
+            # The most valuable trajectory will be chosen and returned from this function
+
+    return Best_U_vector, BestTraj
 
     pass
 
@@ -243,16 +264,15 @@ def trajectory_prediction(robot, vel, omega, dt, dwa_param):
     # Should it be a list or a tuple? Does it matter?
 
 
-def choose_trajectory(robot, dwa_param):
-    pass
-
-
 def dwa_planner(env, dwa_param, robot, dt):
-    Dyn_Win_edges = dynamic_window_v2(robot, dt)
+    Dyn_Win_edges = dynamic_window(robot, dt)
+    u, BestTraj = create_and_choose_trajectory(env.goal, robot, Dyn_Win_edges, dwa_param)
 
-    All_Trajectories = create_and_choose_trajectory(robot, Dyn_Win_edges, dwa_param)
+    robot.vx = u[0] * cos(robot.theta)
+    robot.vy = u[0] * sin(robot.theta)
+    robot.W = u[1]
 
-    pass
+    robot.Traj = BestTraj
 
 
 def dist_from_obs(robot, env, obstacle):
@@ -282,8 +302,9 @@ def main():
 
     DWA_Parameters = DWA_Config()
 
-    robot_proto = Robot(5, 5, 45, 1, 1)
-    robot_proto.ax = 0.05  # This value is the one that makes the movement, For now this line is only for the simulation
+    robot_proto = Robot(5, 5, (45 * pi / 180))
+    # robot_proto.ax = 0.05  # This value is the one that makes the movement, For now this line is only for the
+    # simulation
 
     dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
