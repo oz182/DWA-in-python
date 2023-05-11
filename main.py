@@ -273,7 +273,11 @@ def trajectory_prediction(robot, vel, omega, dt, dwa_param):
 
 
 def arrived_to_goal(robot, env, dwa_param):
-    if (robot.x - env.goal[0] == dwa_param.ArriveTolerance) and (robot.y - env.goal[1] == dwa_param.ArriveTolerance):
+    CloseToGoal_X = abs(robot.x - env.goal[0])
+    CloseToGoal_Y = abs(robot.y - env.goal[1])
+
+    if (CloseToGoal_X <= dwa_param.ArriveTolerance) and (CloseToGoal_Y <= dwa_param.ArriveTolerance):
+        # If arrived to goal
         return 1
     else:
         return 0
@@ -300,28 +304,19 @@ def dist_from_obs(robot, env, obstacle):
     pass
 
 
-def motion_planner(robot):
-    # while robot position is NOT close to the goal position.
-    # Close definition will be given with some tolerance.
-
-    # This function will be universal and can be use in other projects.
-
-    pass
-
-
 def main():
-    # Create a new environment and add obstacles to it
-
+    # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
     envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
     envFrame.add_obstacle(obstacle(x=3, y=7, radius=15))
-    envFrame.SetGoal(2, 2)
+    envFrame.SetGoal(2, 8)
 
-    DWA_Parameters = DWA_Config()
+    DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 
-    robot_proto = Robot(5, 5, (45 * pi / 180))
-    # robot_proto.ax = 0.05  # This value is the one that makes the movement, For now this line is only for the
-    # simulation
+    robot_proto = Robot(1, 2, (45 * pi / 180))  # Create the Robot entity
+
+    # -------------- Motion planner part -----------------------------------
+    # This part can be placed inside it's own function.
 
     while not arrived_to_goal(robot_proto, envFrame, DWA_Parameters):
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
@@ -329,8 +324,6 @@ def main():
         simulation(robot_proto, envFrame, TIME_STEP)
 
     print("Arrived To Goal!")
-
-    # Write a function that stops the robot (in the robot object)
 
 
 if __name__ == "__main__":
