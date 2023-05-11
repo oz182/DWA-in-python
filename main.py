@@ -32,6 +32,7 @@ class Robot:
         self.theta = theta  # Set angle initial position
         self.vx = 0
         self.vy = 0
+        self.V = sqrt(self.vx ^ 2 + self.vy ^ 2)
         self.ax = 0
         self.ay = 0
         self.W = 0
@@ -40,8 +41,9 @@ class Robot:
 
         self.Vmax = 20  # [m/s]
         self.Wmax = 40.0 * pi / 180.0  # [rad/s]
-        self.acc_max = 2  # [m/ss]
+        self.acc_max = 5  # [m/ss]
         self.RotAccMax = 40.0 * pi / 180.0  # [rad/ss]
+        self.Dimensions = 10  # Circle Radius
 
     def update(self, dt):  # Update the robot position and velocities based on the acceleration and time interval
         # Velocity update
@@ -133,7 +135,7 @@ def simulation(robot, env, TIME_STEP):
     ax.set_xlim([0, env.width])
     ax.set_ylim([0, env.height])
 
-    plt.plot(robot.x, robot.y, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="green")
+    plt.plot(robot.x, robot.y, marker="o", markersize=robot.Dimensions, markeredgecolor="red", markerfacecolor="green")
 
     for i in range(len(robot.Traj[0])):
         plt.plot((robot.Traj[0][i] * cos(robot.Traj[2][i])), (robot.Traj[1][i] * sin(robot.Traj[2][i])),
@@ -163,8 +165,8 @@ def dynamic_window(robot, dt):
     V_ss = [-robot.Vmax, robot.Vmax]
     # array from min speed (negative max speed - for now i kept it as zero), max speed, with some steps
 
-    V_d = [robot.vx - (robot.acc_max * dt),
-           robot.vx + (robot.acc_max * dt)]  # Only Vx... Might needs to be Vxy, or add another list of Vy
+    V_d = [robot.V - (robot.acc_max * dt),
+           robot.V + (robot.acc_max * dt)]
 
     V_r = [max(V_ss[0], V_d[0]), min(V_ss[1], V_d[1])]
     # Explanation for the intersection above:
@@ -198,6 +200,7 @@ def goal_cost(trajectory, goal):
 
 
 def obstacle_cost(trajectory, obs):
+
     return 0
 
 
@@ -219,6 +222,9 @@ def create_and_choose_trajectory(goal, robot, dynamic_win, dwa_param):
     rotational_vel_list = list(np.arange(dynamic_win[1][0], dynamic_win[1][1], dwa_param.speed_Res))
     # list of all the velocities in the W axis, by a defined resolution - rotational
 
+    Best_U_vector = [0, 0]  # Initial values
+    BestTraj = []
+    
     MinTotalCost = float(inf)  # Define the initial cost to infinity - for minimizing the cost function
 
     for vel in straight_vel_list:
@@ -309,11 +315,11 @@ def main():
     envFrame = Env(10, 10)
     envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
     envFrame.add_obstacle(obstacle(x=3, y=7, radius=15))
-    envFrame.SetGoal(2, 8)
+    envFrame.SetGoal(6, 8)
 
     DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 
-    robot_proto = Robot(1, 2, (45 * pi / 180))  # Create the Robot entity
+    robot_proto = Robot(1, 2, (45 * pi / 180))  # Create the Robot entity - gets [x, y, theta]
 
     # -------------- Motion planner part -----------------------------------
     # This part can be placed inside it's own function.
