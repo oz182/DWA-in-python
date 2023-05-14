@@ -138,10 +138,8 @@ def simulation(robot, env):
     plt.plot(robot.x, robot.y, marker="o", markersize=robot.Dimensions, markeredgecolor="red", markerfacecolor="green")
 
     for i in range(len(robot.Traj[0][:])):
-        plt.plot((robot.Traj[0][i] * cos(robot.Traj[2][i])), (robot.Traj[1][i] * sin(robot.Traj[2][i])),
-                 color="red")
-
-    #  The plot trajectory is not working
+        plt.plot((robot.Traj[0][i]), (robot.Traj[1][i]),
+                 color="red", marker='*', markersize=2)
 
     for obs in env.obstacles:
         plt.plot(obs.x, obs.y, marker='o', markersize=obs.radius, markeredgecolor="black", markerfacecolor="red")
@@ -273,10 +271,10 @@ def trajectory_prediction(robot, vel, omega, dt, dwa_param):
     Temp_robotTHETA = robot.theta
 
     for step_num in np.arange(0, dwa_param.PredictTime, dt):
-        Temp_robotX = Temp_robotX + (vel * cos(robot.theta) * dt)
+        Temp_robotX = Temp_robotX + (vel * cos(Temp_robotTHETA) * dt)
         Traj_X_PositionList.append(Temp_robotX)
 
-        Temp_robotY = Temp_robotY + (vel * sin(robot.theta) * dt)
+        Temp_robotY = Temp_robotY + (vel * sin(Temp_robotTHETA) * dt)
         Traj_Y_PositionList.append(Temp_robotY)
 
         Temp_robotTHETA = Temp_robotTHETA + (omega * dt)
