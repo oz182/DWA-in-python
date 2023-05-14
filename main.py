@@ -4,7 +4,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 from math import *
 
 TIME_STEP = 0.1  # Simulation Time step
@@ -39,9 +38,9 @@ class Robot:
 
         self.Traj = []
 
-        self.Vmax = 20  # [m/s]
+        self.Vmax = 3  # [m/s]
         self.Wmax = 40.0 * pi / 180.0  # [rad/s]
-        self.acc_max = 5  # [m/ss]
+        self.acc_max = 10  # [m/ss]
         self.RotAccMax = 40.0 * pi / 180.0  # [rad/ss]
         self.Dimensions = 10  # Circle Radius
 
@@ -55,6 +54,10 @@ class Robot:
         # Heading update
         self.theta = self.theta + self.W * dt
 
+    def dist_to_obs(self, obs):
+        DistRobotToObs = sqrt(((self.x - obs.x) ** 2) + (self.y - obs.y) ** 2) + (obs.radius / 10)
+        return DistRobotToObs
+
 
 class Env:
     def __init__(self, width, height):
@@ -63,18 +66,18 @@ class Env:
         self.obstacles = []
         self.goal = ()
 
-    def add_obstacle(self, obstacle):
+    def add_obstacle(self, obs):
         # Add an obstacle to the environment
-        self.obstacles.append((obstacle))
+        self.obstacles.append(obs)
 
-    def RanddomObstacles(self, NumberOfObs, Env):
+    def make_random_obstacles(self, NumberOfObs):
         # The function creates a random obstacles (In a loop) and using the insert them into the environment object
 
         # Output: ----------------
         #
         pass
 
-    def SetGoal(self, x, y):
+    def set_goal(self, x, y):
         # In this function the user can set the goal position for the robot (just x and y coordinates)
         self.goal = (x, y)
         pass
@@ -95,11 +98,12 @@ class DWA_Config:
         self.SPEED = 1
         self.AVOIDANCE = 1
         self.SIGMA = 1
-        self.speed_Res = 0.01
+        self.speed_Res = 0.1
         self.PredictTime = 3
         self.ArriveTolerance = 0.3
 
 
+"""
 class Trajectory:
     def __init__(self, V, W):
         self.xPos = []
@@ -111,22 +115,18 @@ class Trajectory:
     def NewTraj(self, x, y):
         self.xPos.append(x)
         self.yPos.append(y)
+"""
 
 
 # ----------- Define functions of the algorithm (Except the simulation function) -------------
 
-def simulation(robot, env, TIME_STEP):
+def simulation(robot, env):
     # Create a plot to visualize the simulation
     ax = plt.subplot()
 
     ax.set_xlim([0, env.width])
     ax.set_ylim([0, env.height])
     plt.grid()
-
-    # ax.set_aspect('equal')
-    # plt.ion()
-    # plt.plot(robot.x, robot.y, marker="o", markersize=15, markeredgecolor="red", markerfacecolor="green")
-    # plt.show()
 
     # Update the robot's position and plot it
     # robot.update(TIME_STEP)
@@ -137,7 +137,7 @@ def simulation(robot, env, TIME_STEP):
 
     plt.plot(robot.x, robot.y, marker="o", markersize=robot.Dimensions, markeredgecolor="red", markerfacecolor="green")
 
-    for i in range(len(robot.Traj[0])):
+    for i in range(len(robot.Traj[0][:])):
         plt.plot((robot.Traj[0][i] * cos(robot.Traj[2][i])), (robot.Traj[1][i] * sin(robot.Traj[2][i])),
                  color="red")
 
@@ -170,22 +170,21 @@ def dynamic_window(robot, dt):
 
     V_r = [max(V_ss[0], V_d[0]), min(V_ss[1], V_d[1])]
     # Explanation for the intersection above:
-    # MAX between the minimum speeds (search and admirable)
-    # MIN between the maximum speeds (search and admirable)
+    # MAX between the minimum speeds (search and dynamic)
+    # MIN between the maximum speeds (search and dynamic)
 
     # ----Rotational speed axis-----#
     W_ss = [-robot.Wmax, robot.Wmax]
 
     W_d = [robot.W - (robot.RotAccMax * dt),
            robot.W + (robot.RotAccMax * dt)]
+
     W_r = [max(W_ss[0], W_d[0]), min(W_ss[1], W_d[1])]
     # Explanation for the intersection above:
-    # MAX between the minimum speeds (search and admirable)
-    # MIN between the maximum speeds (search and admirable)
+    # MAX between the minimum speeds (search and dynamic)
+    # MIN between the maximum speeds (search and dynamic)
 
     return V_r, W_r
-
-    pass
 
 
 def goal_cost(trajectory, goal):
@@ -199,9 +198,9 @@ def goal_cost(trajectory, goal):
     return GoalCostValue
 
 
-def obstacle_cost(trajectory, obs):
-
-    return 0
+def obstacle_cost(DistToObs):
+    DistFromObsCost = 1 / DistToObs
+    return DistFromObsCost
 
 
 def speed_cost(robot, vel):
@@ -210,7 +209,7 @@ def speed_cost(robot, vel):
     return SpeedCostValue
 
 
-def create_and_choose_trajectory(goal, robot, dynamic_win, dwa_param):
+def create_and_choose_trajectory(env, robot, dynamic_win, dwa_param):
     # This Function will generate each nominated trajectory, and choose the best one so far in each inside loop.
 
     # Input: robot class, the dynamic window, and speed resolution
@@ -224,32 +223,39 @@ def create_and_choose_trajectory(goal, robot, dynamic_win, dwa_param):
 
     Best_U_vector = [0, 0]  # Initial values
     BestTraj = []
-    
+
+    #  Both of the speeds V_a and W_a, define as admissible velocities. These velocities are the last component of the
+    #  window. instead of integrate it in the dynamic window function, for me, it made more sense to use them here.
+    #  The formula comes form the kinematic equations of motion of a two wheeled robot on a 2d plane.
+    DistToNearObs, NearestObs = find_nearest_obs(robot, env)
+    V_a = [sqrt(2 * DistToNearObs * robot.acc_max)]
+    W_a = [sqrt(2 * DistToNearObs * robot.RotAccMax)]
+
     MinTotalCost = float(inf)  # Define the initial cost to infinity - for minimizing the cost function
 
     for vel in straight_vel_list:
 
         for omega in rotational_vel_list:
-            PredictTraj = trajectory_prediction(robot, vel, omega, TIME_STEP, dwa_param)
 
-            TotalCost = dwa_param.SIGMA * ((goal_cost(PredictTraj, goal) * dwa_param.HEADING) +
-                                           (speed_cost(robot, vel) * dwa_param.SPEED) +
-                                           (obstacle_cost(PredictTraj, goal) * dwa_param.AVOIDANCE))
+            if vel < V_a and omega < W_a:  # Take these velocities only if it is safe for the robot to be able to stop
+                # before collision
 
-            if MinTotalCost >= TotalCost:
-                MinTotalCost = TotalCost
+                PredictTraj = trajectory_prediction(robot, vel, omega, TIME_STEP, dwa_param)
 
-                Best_U_vector = [vel, omega]
-                BestTraj = PredictTraj
+                TotalCost = dwa_param.SIGMA * ((goal_cost(PredictTraj, env.goal) * dwa_param.HEADING) +
+                                               (speed_cost(robot, vel) * dwa_param.SPEED) +
+                                               (obstacle_cost(DistToNearObs) * dwa_param.AVOIDANCE))
+
+                if MinTotalCost >= TotalCost:
+                    MinTotalCost = TotalCost
+
+                    Best_U_vector = [vel, omega]
+                    BestTraj = PredictTraj
 
             # This trajectory needs to be compared to the last trajectory (In terms of cost)
             # The most valuable trajectory will be chosen and returned from this function
-    print(Best_U_vector)
+    robot.Traj = BestTraj
     return Best_U_vector, BestTraj
-
-    pass
-
-    return 0
 
 
 def trajectory_prediction(robot, vel, omega, dt, dwa_param):
@@ -259,6 +265,8 @@ def trajectory_prediction(robot, vel, omega, dt, dwa_param):
     Traj_X_PositionList = []
     Traj_Y_PositionList = []
     Traj_THETA_PositionList = []
+
+    StepNumList = []
 
     Temp_robotX = robot.x
     Temp_robotY = robot.y
@@ -273,6 +281,8 @@ def trajectory_prediction(robot, vel, omega, dt, dwa_param):
 
         Temp_robotTHETA = Temp_robotTHETA + (omega * dt)
         Traj_THETA_PositionList.append(Temp_robotTHETA)
+
+        StepNumList.append(step_num)  # Not used
 
     return [Traj_X_PositionList, Traj_Y_PositionList, Traj_THETA_PositionList]
     # Should it be a list or a tuple? Does it matter?
@@ -290,8 +300,12 @@ def arrived_to_goal(robot, env, dwa_param):
 
 
 def dwa_planner(env, dwa_param, robot, dt):
+    # Function that runs the algorithm, for one time step.
+    # The function gets a given state (of the robot and the environment).
+    # The function outputs the speed command for the robot (Forward and rotational velocity)
+
     Dyn_Win_edges = dynamic_window(robot, dt)
-    u, BestTraj = create_and_choose_trajectory(env.goal, robot, Dyn_Win_edges, dwa_param)
+    u, BestTraj = create_and_choose_trajectory(env, robot, Dyn_Win_edges, dwa_param)
 
     robot.vx = u[0] * cos(robot.theta)
     robot.vy = u[0] * sin(robot.theta)
@@ -302,20 +316,25 @@ def dwa_planner(env, dwa_param, robot, dt):
     robot.Traj = BestTraj
 
 
-def dist_from_obs(robot, env, obstacle):
-    # Function that calculates the current distance from an obstacle
+def find_nearest_obs(robot, env):
+    Dist = float('inf')
+    closest_distance = float('inf')
+    closest_obs = 0
 
-    dist = sqrt(robot.x + obstacle.x)
-
-    pass
+    for obs in env.obstacles:
+        Dist = robot.dist_to_obs(obs)
+        if Dist < closest_distance:
+            closest_distance = Dist
+            closest_obs = obs
+    return Dist, closest_obs
 
 
 def main():
     # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
     envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
-    envFrame.add_obstacle(obstacle(x=3, y=7, radius=15))
-    envFrame.SetGoal(6, 8)
+    envFrame.add_obstacle(obstacle(x=3, y=4, radius=15))
+    envFrame.set_goal(3.2, 8)
 
     DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 
@@ -327,9 +346,12 @@ def main():
     while not arrived_to_goal(robot_proto, envFrame, DWA_Parameters):
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
-        simulation(robot_proto, envFrame, TIME_STEP)
+        simulation(robot_proto, envFrame)
 
     print("Arrived To Goal!")
+
+    simulation(robot_proto, envFrame)  # Keep showing the simulation after arrived to goal
+    plt.show()
 
 
 if __name__ == "__main__":
