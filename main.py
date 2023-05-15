@@ -39,9 +39,9 @@ class Robot:
         self.Traj = []
 
         self.Vmax = 3  # [m/s]
-        self.Wmax = 40.0 * pi / 180.0  # [rad/s]
+        self.Wmax = 90.0 * pi / 180.0  # [rad/s]
         self.acc_max = 10  # [m/ss]
-        self.RotAccMax = 40.0 * pi / 180.0  # [rad/ss]
+        self.RotAccMax = 120.0 * pi / 180.0  # [rad/ss]
         self.Dimensions = 10  # Circle Radius
 
     def update(self, dt):  # Update the robot position and velocities based on the acceleration and time interval
@@ -94,28 +94,13 @@ class obstacle:
 
 class DWA_Config:
     def __init__(self):
-        self.HEADING = 1
-        self.SPEED = 1
-        self.AVOIDANCE = 1
+        self.HEADING = 0.4
+        self.SPEED = 0.5
+        self.AVOIDANCE = 0
         self.SIGMA = 1
         self.speed_Res = 0.1
         self.PredictTime = 3
         self.ArriveTolerance = 0.3
-
-
-"""
-class Trajectory:
-    def __init__(self, V, W):
-        self.xPos = []
-        self.yPos = []
-        self.AnglePos = []
-        self.V = V
-        self.W = W
-
-    def NewTraj(self, x, y):
-        self.xPos.append(x)
-        self.yPos.append(y)
-"""
 
 
 # ----------- Define functions of the algorithm (Except the simulation function) -------------
@@ -220,7 +205,7 @@ def create_and_choose_trajectory(env, robot, dynamic_win, dwa_param):
     # list of all the velocities in the W axis, by a defined resolution - rotational
 
     Best_U_vector = [0, 0]  # Initial values
-    BestTraj = []
+    BestTraj = [[]]
 
     #  Both of the speeds V_a and W_a, define as admissible velocities. These velocities are the last component of the
     #  window. instead of integrate it in the dynamic window function, for me, it made more sense to use them here.
@@ -246,7 +231,6 @@ def create_and_choose_trajectory(env, robot, dynamic_win, dwa_param):
 
                 if MinTotalCost >= TotalCost:
                     MinTotalCost = TotalCost
-
                     Best_U_vector = [vel, omega]
                     BestTraj = PredictTraj
 
@@ -327,12 +311,27 @@ def find_nearest_obs(robot, env):
     return Dist, closest_obs
 
 
+def obstacles_on_traj(AllObstaclesList, PredictedTraj):
+
+    for obs in AllObstaclesList:
+
+        for x, y in zip(PredictedTraj[0], PredictedTraj[1]):
+
+            if (abs(x - obs.x) < obs.radius) and (abs(y - obs.y) < obs.radius):
+                return 1
+            else:
+                return 0
+
+
 def main():
     # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
     envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
     envFrame.add_obstacle(obstacle(x=3, y=4, radius=15))
-    envFrame.set_goal(3.2, 8)
+    envFrame.add_obstacle(obstacle(x=6, y=8, radius=15))
+    envFrame.add_obstacle(obstacle(x=3.5, y=6, radius=15))
+    envFrame.add_obstacle(obstacle(x=5, y=2, radius=15))
+    envFrame.set_goal(8, 2)
 
     DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 
