@@ -2,9 +2,9 @@
 
 # Import necessary libraries and modules
 
-from EnvironmentClass import *
-from RobotClass import *
-from DynamicWindowAlgo import *
+from GeneralObjects.EnvironmentClass import *
+from GeneralObjects.RobotClass import *
+from NavAlgo.DynamicWindowAlgo import *
 from Simulation import *
 
 TIME_STEP = 0.1  # Simulation Time step
