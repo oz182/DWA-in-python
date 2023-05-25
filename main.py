@@ -5,6 +5,7 @@
 from EnvironmentClass import *
 from RobotClass import *
 from DynamicWindowAlgo import *
+from Simulation import *
 
 TIME_STEP = 0.1  # Simulation Time step
 
