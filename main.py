@@ -171,8 +171,8 @@ def dynamic_window(robot, dt):
 
 
 def goal_cost(trajectory, goal):
-    delta_x = abs(goal[0] - trajectory[0][-1])  # trajectory[x position][last value] - Take the end of the trajectory
-    delta_y = abs(goal[1] - trajectory[1][-1])
+    delta_x = (goal[0] - trajectory[0][-1])  # trajectory[x position][last value] - Take the end of the trajectory
+    delta_y = (goal[1] - trajectory[1][-1])
 
     delta_head = atan2(delta_y, delta_x)
 
@@ -341,6 +341,7 @@ def main():
     # This part can be placed inside it's own function.
 
     while not arrived_to_goal(robot_proto, envFrame, DWA_Parameters):
+
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
         simulation(robot_proto, envFrame)
