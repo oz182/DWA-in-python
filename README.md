@@ -1,2 +1,2 @@
-# DWA-in-python
-Python simulation for DWA algorithm
+#   DWA-in-python
+###Python simulation for DWA algorithm
