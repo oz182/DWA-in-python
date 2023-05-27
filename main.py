@@ -7,20 +7,13 @@ from GeneralObjects.RobotClass import *
 from NavAlgo.DynamicWindowAlgo import *
 from Simulation import *
 
-TIME_STEP = 0.1  # Simulation Time step
-
-
-# ---------------------- Define classes and functions for the simulation ---------------------
-
-class Config:
-
-    # This function will store all the configuration parameters for the simulation and for other main purposes
-
-    def __init__(self):
-        self.dt = 0.1
+TIME_STEP = 0.1  # Algorithm Time step
 
 
 def main():
+    # Collect the current frame from the simulation
+    SimFrames = []
+
     # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
     envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
@@ -35,17 +28,20 @@ def main():
     robot_proto = Robot(1, 2, (45 * pi / 180))  # Create the Robot entity - gets [x, y, theta]
 
     # -------------- Motion planner part -----------------------------------
-    # This part can be placed inside it's own function.
 
     while not arrived_to_goal(robot_proto, envFrame, DWA_Parameters):
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
-        simulation(robot_proto, envFrame)
+        SimCurrentFrame = simulation(robot_proto, envFrame)
+
+        SimFrames.append(SimCurrentFrame)
 
     print("Arrived To Goal!")
 
-    simulation(robot_proto, envFrame)  # Keep showing the simulation after arrived to goal
-    plt.show()
+    # Keep showing the simulation after arrived to goal (Hold the last frame)
+    simulation(robot_proto, envFrame)
+    sim_movie(SimFrames)  # Outputs mp4 animation file
+    # plt.show() # Uncomment if you want to keep the last frame presented on the screen
 
 
 if __name__ == "__main__":

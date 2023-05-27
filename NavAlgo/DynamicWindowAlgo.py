@@ -18,6 +18,8 @@ class DWA_Config:
         self.PredictTime = 3
         self.ArriveTolerance = 0.3
 
+        self.dt = 0.1
+
 
 # ----------- Define functions of the algorithm (Except the simulation function) -------------
 
@@ -141,6 +143,7 @@ def trajectory_prediction(robot, vel, omega, dt, dwa_param):
     Temp_robotTHETA = robot.theta
 
     for step_num in np.arange(0, dwa_param.PredictTime, dt):
+
         Temp_robotX = Temp_robotX + (vel * cos(Temp_robotTHETA) * dt)
         Traj_X_PositionList.append(Temp_robotX)
 
