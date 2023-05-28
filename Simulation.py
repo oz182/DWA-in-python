@@ -1,31 +1,20 @@
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, FFMpegWriter
-import imageio
+from matplotlib.animation import FuncAnimation  # FFMpegWriter
+
+# import imageio  # Activate for function "movie_sim2"
 
 fig, ax = plt.subplots()
 
 
 def simulation(robot, env):
     # Create a plot to visualize the simulation
-    #fig = plt.figure()
-    # plt.close()
-    # ax = plt.subplot()
-
-    plt.xlim(0, env.width)
-    plt.ylim(0, env.height)
-
-    #ax.set_xlim([0, env.width])
-    #ax.set_ylim([0, env.height])
-    plt.grid()
-
     # Update the robot's position and plot it
     # robot.update(TIME_STEP)
 
-
-
+    plt.grid()
     ax.clear()
-    #ax.set_xlim([0, env.width])
-    #ax.set_ylim([0, env.height])
+    ax.set_xlim([0, env.width])
+    ax.set_ylim([0, env.height])
 
     # Robot draw - updated position
     plt.plot(robot.x, robot.y, marker="o", markersize=robot.Dimensions, markeredgecolor="red", markerfacecolor="green")
@@ -65,14 +54,18 @@ def sim_movie(fig_list):
     print("Animation file has created!")
 
 
+# Another way to save the animation
+# Not working
+
+"""
 def sim_movie2(fig_list):
     frame_paths = []
     # Save each figure as a separate image file
     print("Creating animation file: ")
-    for i, fig in enumerate(fig_list):
+    for i, figu in enumerate(fig_list):
         frame_path = f"frame_{i}.png"  # Provide a file path for each frame
-        fig.savefig(frame_path)
-        plt.close(fig)  # Close the figure to release memory (optional)
+        figu.savefig(frame_path)
+        plt.close(figu)  # Close the figure to release memory (optional)
         frame_paths.append(frame_path)
 
     # Create the animation from the saved frames
@@ -82,3 +75,4 @@ def sim_movie2(fig_list):
         images.append(imageio.imread(frame_path))
     imageio.mimsave('animation.gif', images, duration=0.2)
     print("Animation file has created!")
+"""

@@ -40,7 +40,9 @@ def main():
 
     # Keep showing the simulation after arrived to goal (Hold the last frame)
     simulation(robot_proto, envFrame)
-    sim_movie(SimFrames)  # Outputs mp4 animation file
+
+    # Un comment to save the animation video
+    # sim_movie(SimFrames)  # Outputs mp4 animation file
     # plt.show() # Uncomment if you want to keep the last frame presented on the screen
 
 
