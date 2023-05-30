@@ -12,7 +12,7 @@ class DWA_Config:
     def __init__(self):
         self.HEADING = 0.4
         self.SPEED = 0.5
-        self.AVOIDANCE = 0
+        self.AVOIDANCE = 0.1
         self.SIGMA = 1
         self.speed_Res = 0.1
         self.PredictTime = 3
@@ -75,7 +75,7 @@ def obstacle_cost(DistToObs):
 
 
 def speed_cost(robot, vel):
-    SpeedCostValue = robot.Vmax - vel
+    SpeedCostValue = abs(robot.Vmax - vel)
 
     return SpeedCostValue
 
@@ -113,9 +113,11 @@ def create_and_choose_trajectory(env, robot, dynamic_win, dwa_param):
 
                 PredictTraj = trajectory_prediction(robot, vel, omega, TIME_STEP, dwa_param)
 
-                TotalCost = dwa_param.SIGMA * ((goal_cost(PredictTraj, env.goal) * dwa_param.HEADING) +
-                                               (speed_cost(robot, vel) * dwa_param.SPEED) +
-                                               (obstacle_cost(DistToNearObs) * dwa_param.AVOIDANCE))
+                GoalCost = (goal_cost(PredictTraj, env.goal)) * dwa_param.HEADING
+                SpeedCost = (speed_cost(robot, vel)) * dwa_param.SPEED
+                ObstacleCost = (obstacle_cost(DistToNearObs)) * dwa_param.AVOIDANCE
+
+                TotalCost = dwa_param.SIGMA * (GoalCost + SpeedCost + ObstacleCost)
 
                 if MinTotalCost >= TotalCost:
                     MinTotalCost = TotalCost

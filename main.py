@@ -21,7 +21,7 @@ def main():
     envFrame.add_obstacle(obstacle(x=6, y=8, radius=15))
     envFrame.add_obstacle(obstacle(x=3.5, y=6, radius=15))
     envFrame.add_obstacle(obstacle(x=5, y=2, radius=15))
-    envFrame.set_goal(8, 2)
+    envFrame.set_goal(5, 7)
 
     DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 

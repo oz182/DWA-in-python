@@ -31,7 +31,7 @@ def simulation(robot, env):
 
     plt.grid()
     plt.draw()
-    plt.pause(0.001)
+    plt.pause(0.01)
 
     return fig
 
@@ -47,15 +47,15 @@ def sim_movie(fig_list):
         plt.imshow(fig_list[i].canvas.renderer.buffer_rgba(), origin='upper')
 
     # Create the animation object
-    ani = FuncAnimation(animation_fig, animate, frames=len(fig_list), interval=200, blit=False)
+    ani = FuncAnimation(animation_fig, animate, frames=len(fig_list), interval=1000, blit=False)
     print("Collecting simulation data, Please wait...")
     # Save the animation as a video file (e.g., MP4)
-    ani.save('animation.gif', writer='pillow')
+    # ani.save('animation.gif', writer='pillow')  # ---------- Uncomment to save the .gif file -----------
     print("Animation file has created!")
 
 
 # Another way to save the animation
-# Not working
+# Not working so good
 
 """
 def sim_movie2(fig_list):
