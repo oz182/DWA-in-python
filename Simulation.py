@@ -43,14 +43,14 @@ def sim_movie(fig_list):
 
     # Define the animation function
     def animate(i):
-        animation_fig.clear()
+        # animation_fig.clear()
         plt.imshow(fig_list[i].canvas.renderer.buffer_rgba(), origin='upper')
 
     # Create the animation object
     ani = FuncAnimation(animation_fig, animate, frames=len(fig_list), interval=1000, blit=False)
     print("Collecting simulation data, Please wait...")
     # Save the animation as a video file (e.g., MP4)
-    # ani.save('animation.gif', writer='pillow')  # ---------- Uncomment to save the .gif file -----------
+    ani.save('animation.gif', writer='pillow')  # ---------- Uncomment to save the .gif file -----------
     print("Animation file has created!")
 
 

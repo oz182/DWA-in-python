@@ -64,9 +64,16 @@ def goal_cost(trajectory, goal):
 
     delta_head = atan2(delta_y, delta_x)
 
-    GoalCostValue = abs(delta_head - trajectory[2][-1])  # trajectory[Theta Pos][Last Value]
+    # delta_head_deg = delta_head * (180 / pi)
 
-    return GoalCostValue
+    # traj_head_deg = trajectory[2][-1] * (180 / pi)
+
+    GoalCostValue = abs(delta_head - trajectory[2][-1])  # trajectory[Theta Pos][Last Value]
+    GoalCostValue_deg = GoalCostValue * (180 / pi)
+
+    Norm_GoalCost = GoalCostValue_deg / 180
+
+    return Norm_GoalCost
 
 
 def obstacle_cost(DistToObs):
@@ -77,7 +84,10 @@ def obstacle_cost(DistToObs):
 def speed_cost(robot, vel):
     SpeedCostValue = abs(robot.Vmax - vel)
 
-    return SpeedCostValue
+    # Normalization for the result:
+    Norm_SpeedCost = SpeedCostValue / robot.Vmax
+
+    return Norm_SpeedCost
 
 
 def create_and_choose_trajectory(env, robot, dynamic_win, dwa_param):
@@ -195,7 +205,7 @@ def find_nearest_obs(robot, env):
     closest_obs = 0
 
     for obs in env.obstacles:
-        Dist = robot.dist_to_obs(obs)
+        Dist = robot.dist_to_obs(obs)  # The robot has the ability to tell the distance from an obstacle
         if Dist < closest_distance:
             closest_distance = Dist
             closest_obs = obs

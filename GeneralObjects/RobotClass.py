@@ -37,5 +37,7 @@ class Robot:
         self.theta = self.theta + self.W * dt
 
     def dist_to_obs(self, obs):
+        # The robot has the ability to tell the distance from an obstacle
+
         DistRobotToObs = sqrt(((self.x - obs.x) ** 2) + (self.y - obs.y) ** 2) + (obs.radius / 10)
         return DistRobotToObs
