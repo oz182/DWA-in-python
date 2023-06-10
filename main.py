@@ -1,6 +1,7 @@
 # DWA navigation Simulation
 
 # Import necessary libraries and modules
+import matplotlib.pyplot as plt
 
 from GeneralObjects.EnvironmentClass import *
 from GeneralObjects.RobotClass import *
@@ -9,10 +10,15 @@ from Simulation import *
 
 TIME_STEP = 0.1  # Algorithm Time step
 
+MAX_ITERATIONS = 1000  # Maximum iterations for the algorithm
+
 
 def main():
     # Collect the current frame from the simulation
     SimFrames = []
+
+    # Follow the number of iterations it takes to reach the goal
+    Iter = 0
 
     # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
@@ -29,17 +35,19 @@ def main():
 
     # -------------- Motion planner part -----------------------------------
 
-    while not arrived_to_goal(robot_proto, envFrame, DWA_Parameters):
+    while (not arrived_to_goal(robot_proto, envFrame, DWA_Parameters)) or Iter > MAX_ITERATIONS:
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
         SimCurrentFrame = simulation(robot_proto, envFrame)
 
         SimFrames.append(SimCurrentFrame)
 
+        Iteration = Iteration + 1  # Update the Iteration number
+
     print("Arrived To Goal!")
 
     # Keep showing the simulation after arrived to goal (Hold the last frame)
-    simulation(robot_proto, envFrame)
+    # simulation(robot_proto, envFrame)
 
     # Un comment to save the animation video
     # sim_movie(SimFrames)  # Outputs mp4 animation file
