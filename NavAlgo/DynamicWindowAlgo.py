@@ -76,7 +76,7 @@ def goal_cost(trajectory, goal):
     return Norm_GoalCost
 
 
-def obstacle_cost(DistToObs):
+def obstacle_cost(Trajectory, DistToObs):
     DistFromObsCost = 1 / DistToObs
     return DistFromObsCost
 
@@ -125,7 +125,7 @@ def create_and_choose_trajectory(env, robot, dynamic_win, dwa_param):
 
                 GoalCost = (goal_cost(PredictTraj, env.goal)) * dwa_param.HEADING
                 SpeedCost = (speed_cost(robot, vel)) * dwa_param.SPEED
-                ObstacleCost = (obstacle_cost(DistToNearObs)) * dwa_param.AVOIDANCE
+                ObstacleCost = (obstacle_cost(PredictTraj, DistToNearObs)) * dwa_param.AVOIDANCE
 
                 TotalCost = dwa_param.SIGMA * (GoalCost + SpeedCost + ObstacleCost)
 

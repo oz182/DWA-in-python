@@ -1,7 +1,7 @@
 # DWA navigation Simulation
 
 # Import necessary libraries and modules
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 from GeneralObjects.EnvironmentClass import *
 from GeneralObjects.RobotClass import *
@@ -18,7 +18,7 @@ def main():
     SimFrames = []
 
     # Follow the number of iterations it takes to reach the goal
-    Iter = 0
+    Sim_Iteration = 0
 
     # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
@@ -35,14 +35,14 @@ def main():
 
     # -------------- Motion planner part -----------------------------------
 
-    while (not arrived_to_goal(robot_proto, envFrame, DWA_Parameters)) or Iter > MAX_ITERATIONS:
+    while (not arrived_to_goal(robot_proto, envFrame, DWA_Parameters)) or Sim_Iteration > MAX_ITERATIONS:
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
         SimCurrentFrame = simulation(robot_proto, envFrame)
 
         SimFrames.append(SimCurrentFrame)
 
-        Iteration = Iteration + 1  # Update the Iteration number
+        Sim_Iteration = Sim_Iteration + 1  # Update the Iteration number
 
     print("Arrived To Goal!")
 

@@ -18,24 +18,23 @@ def simulation(robot, env):
     ax.set_ylim([0, env.height])
 
     # Robot draw - updated position
-    ax.plot(robot.x, robot.y, marker="o", markersize=robot.Dimensions, markeredgecolor="red", markerfacecolor="green")
+    plt.plot(robot.x, robot.y, marker="o", markersize=robot.Dimensions, markeredgecolor="red", markerfacecolor="green")
 
     # Trajectory plot:
     for i in range(len(robot.Traj[0][:])):
-        ax.plot((robot.Traj[0][i]), (robot.Traj[1][i]),
-                color="red", marker='*', markersize=2)
+        plt.plot((robot.Traj[0][i]), (robot.Traj[1][i]),
+                 color="red", marker='*', markersize=2)
 
     for obs in env.obstacles:
-        ax.plot(obs.x, obs.y, marker='o', markersize=obs.radius, markeredgecolor="black", markerfacecolor="red")
+        plt.plot(obs.x, obs.y, marker='o', markersize=obs.radius, markeredgecolor="black", markerfacecolor="red")
 
-    ax.plot(env.goal[0], env.goal[1], marker="s", markersize=10, markeredgecolor="blue", markerfacecolor="green")
+    plt.plot(env.goal[0], env.goal[1], marker="s", markersize=10, markeredgecolor="blue", markerfacecolor="green")
 
-    ax.grid()
+    plt.grid()
     plt.draw()
     plt.pause(0.01)
 
-    CurrentFig = plt.gcf()
-    plt.cla()
+    CurrentFig = plt.gcf().canvas
 
     return CurrentFig
 
