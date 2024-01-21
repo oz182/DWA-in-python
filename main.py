@@ -1,51 +1,57 @@
 # DWA navigation Simulation
 
 # Import necessary libraries and modules
+# import matplotlib.pyplot as plt
 
 from GeneralObjects.EnvironmentClass import *
 from GeneralObjects.RobotClass import *
 from NavAlgo.DynamicWindowAlgo import *
 from Simulation import *
 
-TIME_STEP = 0.1  # Simulation Time step
+TIME_STEP = 0.1  # Algorithm Time step
 
-
-# ---------------------- Define classes and functions for the simulation ---------------------
-
-class Config:
-
-    # This function will store all the configuration parameters for the simulation and for other main purposes
-
-    def __init__(self):
-        self.dt = 0.1
+MAX_ITERATIONS = 1000  # Maximum iterations for the algorithm
 
 
 def main():
+    # Collect the current frame from the simulation
+    SimFrames = []
+
+    # Follow the number of iterations it takes to reach the goal
+    Sim_Iteration = 0
+
     # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
-    envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
-    envFrame.add_obstacle(obstacle(x=3, y=4, radius=15))
-    envFrame.add_obstacle(obstacle(x=6, y=8, radius=15))
-    envFrame.add_obstacle(obstacle(x=3.5, y=6, radius=15))
-    envFrame.add_obstacle(obstacle(x=5, y=2, radius=15))
-    envFrame.set_goal(8, 2)
+    envFrame.add_obstacle(obstacle(x=8, y=4, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=3, y=4, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=6, y=8, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=3.5, y=6, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=5, y=2, radius=0.35))
+    envFrame.set_goal(6, 7)
 
     DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 
     robot_proto = Robot(1, 2, (45 * pi / 180))  # Create the Robot entity - gets [x, y, theta]
 
     # -------------- Motion planner part -----------------------------------
-    # This part can be placed inside it's own function.
 
-    while not arrived_to_goal(robot_proto, envFrame, DWA_Parameters):
+    while (not arrived_to_goal(robot_proto, envFrame, DWA_Parameters)) or Sim_Iteration > MAX_ITERATIONS:
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
 
-        simulation(robot_proto, envFrame)
+        SimCurrentFrame = simulation(robot_proto, envFrame)
+
+        #SimFrames.append(SimCurrentFrame)
+
+        #Sim_Iteration = Sim_Iteration + 1  # Update the Iteration number
 
     print("Arrived To Goal!")
 
-    simulation(robot_proto, envFrame)  # Keep showing the simulation after arrived to goal
-    plt.show()
+    # Keep showing the simulation after arrived to goal (Hold the last frame)
+    # simulation(robot_proto, envFrame)
+
+    # Un comment to save the animation video
+    # sim_movie(SimFrames)  # Outputs mp4 animation file
+    # plt.show() # Uncomment if you want to keep the last frame presented on the screen
 
 
 if __name__ == "__main__":

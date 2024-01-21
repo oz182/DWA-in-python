@@ -21,9 +21,9 @@ class Robot:
         self.Traj = []
 
         self.Vmax = 3  # [m/s]
-        self.Wmax = 90.0 * pi / 180.0  # [rad/s]
+        self.Wmax = 20 # [rad/s]
         self.acc_max = 10  # [m/ss]
-        self.RotAccMax = 120.0 * pi / 180.0  # [rad/ss]
+        self.RotAccMax = 40  # [rad/ss]
         self.Dimensions = 10  # Circle Radius
 
     def update(self, dt):  # Update the robot position and velocities based on the acceleration and time interval
@@ -37,5 +37,12 @@ class Robot:
         self.theta = self.theta + self.W * dt
 
     def dist_to_obs(self, obs):
+        # The robot has the ability to tell the distance from an obstacle
+
         DistRobotToObs = sqrt(((self.x - obs.x) ** 2) + (self.y - obs.y) ** 2) + (obs.radius / 10)
         return DistRobotToObs
+    
+    def is_obs_on_path(self, obs):
+        # The robot needs to have the abilty to tell if there is an obstacle ahead of it on the desierd path
+
+        pass
