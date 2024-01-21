@@ -10,11 +10,11 @@ TIME_STEP = 0.1  # Simulation Time step
 
 class DWA_Config:
     def __init__(self):
-        self.HEADING = 0.4
-        self.SPEED = 0.5
-        self.AVOIDANCE = 0.1
-        self.SIGMA = 1
-        self.speed_Res = 0.1
+        self.HEADING = 0.06
+        self.SPEED = 0.3
+        self.AVOIDANCE = 0.3
+        self.SIGMA = 1  # Doesn't seem to change anything
+        self.speed_Res = 0.3
         self.PredictTime = 3
         self.ArriveTolerance = 0.3
 
@@ -123,16 +123,18 @@ def create_and_choose_trajectory(env, robot, dynamic_win, dwa_param):
 
                 PredictTraj = trajectory_prediction(robot, vel, omega, TIME_STEP, dwa_param)
 
-                GoalCost = (goal_cost(PredictTraj, env.goal)) * dwa_param.HEADING
-                SpeedCost = (speed_cost(robot, vel)) * dwa_param.SPEED
-                ObstacleCost = (obstacle_cost(PredictTraj, DistToNearObs)) * dwa_param.AVOIDANCE
+                if obstacles_on_traj(env.obstacles, PredictTraj) == 0:  # Not in the path of collision
 
-                TotalCost = dwa_param.SIGMA * (GoalCost + SpeedCost + ObstacleCost)
+                    GoalCost = (goal_cost(PredictTraj, env.goal)) * dwa_param.HEADING
+                    SpeedCost = (speed_cost(robot, vel)) * dwa_param.SPEED
+                    ObstacleCost = (obstacle_cost(PredictTraj, DistToNearObs)) * dwa_param.AVOIDANCE
 
-                if MinTotalCost >= TotalCost:
-                    MinTotalCost = TotalCost
-                    Best_U_vector = [vel, omega]
-                    BestTraj = PredictTraj
+                    TotalCost = dwa_param.SIGMA * (GoalCost + SpeedCost + ObstacleCost)
+
+                    if MinTotalCost >= TotalCost:
+                        MinTotalCost = TotalCost
+                        Best_U_vector = [vel, omega]
+                        BestTraj = PredictTraj
 
             # This trajectory needs to be compared to the last trajectory (In terms of cost)
             # The most valuable trajectory will be chosen and returned from this function
@@ -165,10 +167,13 @@ def trajectory_prediction(robot, vel, omega, dt, dwa_param):
         Temp_robotTHETA = Temp_robotTHETA + (omega * dt)
         Traj_THETA_PositionList.append(Temp_robotTHETA)
 
-        StepNumList.append(step_num)  # Not used
+        StepNumList.append(step_num)  # Unused
 
     return [Traj_X_PositionList, Traj_Y_PositionList, Traj_THETA_PositionList]
-    # Should it be a list or a tuple? Does it matter?
+    # From this return, the final tarjectory list that the robot gets, looks as follows:
+    # [x1 x2 x3, ...], [y1, y2, y3, ...], [01, 02, 03, ...]
+    # So in case you want to get the n position on the trajectory, you'll have to wrtie Traj[0][n], Traj[1][n] - which means 
+    # x and y cooridants on the tarjectory.
 
 
 def arrived_to_goal(robot, env, dwa_param):
@@ -218,6 +223,6 @@ def obstacles_on_traj(AllObstaclesList, PredictedTraj):
         for x, y in zip(PredictedTraj[0], PredictedTraj[1]):
 
             if (abs(x - obs.x) < obs.radius) and (abs(y - obs.y) < obs.radius):
-                return 1
-            else:
-                return 0
+                return 1  # True for haveing an obstacle on the dedicated trajectory
+            
+    return 0

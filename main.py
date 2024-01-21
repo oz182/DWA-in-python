@@ -22,12 +22,12 @@ def main():
 
     # Create a new environment, add obstacles and goal.
     envFrame = Env(10, 10)
-    envFrame.add_obstacle(obstacle(x=8, y=4, radius=15))  # For comparison, the size of the robot is 10
-    envFrame.add_obstacle(obstacle(x=3, y=4, radius=15))
-    envFrame.add_obstacle(obstacle(x=6, y=8, radius=15))
-    envFrame.add_obstacle(obstacle(x=3.5, y=6, radius=15))
-    envFrame.add_obstacle(obstacle(x=5, y=2, radius=15))
-    envFrame.set_goal(6, 1)
+    envFrame.add_obstacle(obstacle(x=8, y=4, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=3, y=4, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=6, y=8, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=3.5, y=6, radius=0.35))
+    envFrame.add_obstacle(obstacle(x=5, y=2, radius=0.35))
+    envFrame.set_goal(6, 7)
 
     DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 
@@ -37,7 +37,6 @@ def main():
 
     while (not arrived_to_goal(robot_proto, envFrame, DWA_Parameters)) or Sim_Iteration > MAX_ITERATIONS:
         dwa_planner(envFrame, DWA_Parameters, robot_proto, TIME_STEP)
-        print (robot_proto.Traj[0][1], robot_proto.Traj[1][1])
 
         SimCurrentFrame = simulation(robot_proto, envFrame)
 

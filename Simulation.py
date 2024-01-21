@@ -26,7 +26,7 @@ def simulation(robot, env):
                  color="red", marker='*', markersize=2)
 
     for obs in env.obstacles:
-        plt.plot(obs.x, obs.y, marker='o', markersize=obs.radius, markeredgecolor="black", markerfacecolor="red")
+        plt.plot(obs.x, obs.y, marker='o', markersize=15, markeredgecolor="black", markerfacecolor="red")
 
     plt.plot(env.goal[0], env.goal[1], marker="s", markersize=10, markeredgecolor="blue", markerfacecolor="green")
 
