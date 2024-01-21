@@ -3,3 +3,10 @@
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/vcs.xml
+/.idea/dictionaries
+
+*.DS_Store
+
+# Added python cache files to ignore 
+
+*.pyc

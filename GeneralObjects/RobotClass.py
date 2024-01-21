@@ -41,3 +41,8 @@ class Robot:
 
         DistRobotToObs = sqrt(((self.x - obs.x) ** 2) + (self.y - obs.y) ** 2) + (obs.radius / 10)
         return DistRobotToObs
+    
+    def is_obs_on_path(self, obs):
+        # The robot needs to have the abilty to tell if there is an obstacle ahead of it on the desierd path
+        
+        pass
