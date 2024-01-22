@@ -40,6 +40,10 @@ def main():
 
         SimCurrentFrame = simulation(robot_proto, envFrame)
 
+        # Save each new frame of the simulation as a single pic
+        FrameName = f"{'Ani/frame'}_{Sim_Iteration}"
+        SimCurrentFrame.savefig(FrameName)
+
         SimFrames.append(SimCurrentFrame)
 
         Sim_Iteration = Sim_Iteration + 1  # Update the Iteration number
@@ -50,7 +54,7 @@ def main():
     # simulation(robot_proto, envFrame)
 
     # Un comment to save the animation video
-    sim_movie(SimFrames)  # Outputs mp4 animation file
+    # sim_movie(SimFrames)  # Outputs mp4 animation file - not working
     # plt.show() # Uncomment if you want to keep the last frame presented on the screen
 
 

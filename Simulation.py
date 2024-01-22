@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, PillowWriter  # ArtistAnimation  # FFMpegWriter
+from matplotlib.animation import ArtistAnimation, FuncAnimation, PillowWriter  # ArtistAnimation  # FFMpegWriter
 
 # import imageio  # Activate for function "movie_sim2"
 
@@ -33,9 +33,9 @@ def simulation(robot, env):
     plt.grid()
     plt.draw()
     plt.pause(0.01)
-
-    CurrentFig = plt.gcf().canvas
-
+    
+    CurrentFig = plt.gcf()
+    
     return CurrentFig
 
 
@@ -46,15 +46,16 @@ def sim_movie(fig_list):
     # Define the animation function
     def animate(i):
         # animation_fig.clear()
-        return plt.imshow(fig_list[i].canvas.renderer.buffer_rgba(), origin='upper')
+        return plt.imshow(fig_list[i].renderer.buffer_rgba(), origin='upper')
+    animate
 
     # Create the animation object
     ani = FuncAnimation(fig_list[0], animate, frames=len(fig_list), interval=1000, blit=False)
-    # ani = ArtistAnimation(animation_fig, fig_list)  #  Save a list of images
+    ani = ArtistAnimation(fig_list[0], fig_list)  #  Save a list of images
     print("Collecting simulation data, Please wait...")
 
     # Save the animation as a video file (e.g., MP4)
-    ani.save('animation.gif', writer='pillow')  # ---------- Uncomment to save the .gif file -----------
+    ani.save("animation.gif", dpi=300, writer=PillowWriter)  # ---------- Uncomment to save the .gif file -----------
     print("Animation file has created!")
 
 

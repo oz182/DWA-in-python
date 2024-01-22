@@ -70,7 +70,6 @@ def goal_cost(trajectory, goal):
 
     GoalCostValue = abs(delta_head - trajectory[2][-1])  # trajectory[Theta Pos][Last Value]
     GoalCostValue_deg = GoalCostValue * (180 / pi)
-    print (GoalCostValue_deg)
 
     Norm_GoalCost = GoalCostValue_deg / 180
 
