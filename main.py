@@ -27,7 +27,7 @@ def main():
     envFrame.add_obstacle(obstacle(x=6, y=8, radius=0.35))
     envFrame.add_obstacle(obstacle(x=3.5, y=6, radius=0.35))
     envFrame.add_obstacle(obstacle(x=5, y=2, radius=0.35))
-    envFrame.set_goal(6, 7)
+    envFrame.set_goal(4.8, 7.6)
 
     DWA_Parameters = DWA_Config()  # Create the algorithm configuration object
 
@@ -40,9 +40,9 @@ def main():
 
         SimCurrentFrame = simulation(robot_proto, envFrame)
 
-        #SimFrames.append(SimCurrentFrame)
+        SimFrames.append(SimCurrentFrame)
 
-        #Sim_Iteration = Sim_Iteration + 1  # Update the Iteration number
+        Sim_Iteration = Sim_Iteration + 1  # Update the Iteration number
 
     print("Arrived To Goal!")
 
@@ -50,7 +50,7 @@ def main():
     # simulation(robot_proto, envFrame)
 
     # Un comment to save the animation video
-    # sim_movie(SimFrames)  # Outputs mp4 animation file
+    sim_movie(SimFrames)  # Outputs mp4 animation file
     # plt.show() # Uncomment if you want to keep the last frame presented on the screen
 
 
